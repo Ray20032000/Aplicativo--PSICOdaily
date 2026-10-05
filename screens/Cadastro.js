@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
 
     campo: {
         marginTop: 7,
+        width: 300,
     },
 
     label: {
@@ -247,15 +248,22 @@ const styles = StyleSheet.create({
     },
 
     input: {
-        height: 30,
+        height: 38,
+        width: 300,
+
         borderWidth: 1,
         borderColor: "#1764D1",
-        borderRadius: 18,
-        paddingHorizontal: 10,
+        borderRadius: 20,
+
+        paddingHorizontal: 12,
+        paddingVertical: 0,
+
         fontFamily: "Poppins",
-        fontSize: 11,
+        fontSize: 13,
         color: "#333333",
-        width: 300
+
+        textAlignVertical: "center",
+        includeFontPadding: false,
     },
 
     fotoContainer: {
