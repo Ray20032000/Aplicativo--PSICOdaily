@@ -1,0 +1,17 @@
+# Expo
+.expo/
+.expo-shared/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local

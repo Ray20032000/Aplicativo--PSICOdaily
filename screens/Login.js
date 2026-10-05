@@ -1,250 +1,448 @@
-
 import {
     View,
     Text,
     StyleSheet,
     Pressable,
     Image,
-    Dimensions,
     TextInput,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
 } from "react-native";
 
-const { width } = Dimensions.get("window");
+import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as LocalAuthentication from "expo-local-authentication";
+
+const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
 
 export default function Login({ navigation }) {
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
+    const [carregando, setCarregando] = useState(false);
+
+    const realizarLogin = async () => {
+        if (!email.trim() || !senha) {
+            Alert.alert(
+                "Atenção",
+                "Preencha seu e-mail e sua senha."
+            );
+            return;
+        }
+
+        try {
+            setCarregando(true);
+
+            console.log(
+                "Tentando conectar em:",
+                `${API}/login`
+            );
+
+            const resposta = await fetch(`${API}/api/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email.trim(),
+                    senha: senha,
+                }),
+            });
+
+            const texto = await resposta.text();
+
+            console.log("Status:", resposta.status);
+            console.log("Resposta do Python:", texto);
+
+            let dados = {};
+
+            try {
+                dados = texto ? JSON.parse(texto) : {};
+            } catch {
+                Alert.alert(
+                    "Erro no servidor",
+                    "O servidor não retornou uma resposta válida."
+                );
+                return;
+            }
+
+            if (!resposta.ok) {
+                Alert.alert(
+                    "Não foi possível entrar",
+                    dados.error ||
+                    dados.message ||
+                    "Verifique seu e-mail e sua senha."
+                );
+                return;
+            }
+
+            if (!dados.token) {
+                Alert.alert(
+                    "Erro no login",
+                    "O servidor não enviou o token de acesso."
+                );
+                return;
+            }
+
+            await AsyncStorage.setItem(
+                "@psicodaily_token",
+                dados.token
+            );
+
+            if (dados.usuario) {
+                await AsyncStorage.setItem(
+                    "@psicodaily_usuario",
+                    JSON.stringify(dados.usuario)
+                );
+
+                if (dados.usuario.id_usuario) {
+                    await AsyncStorage.setItem(
+                        "@psicodaily_id_usuario",
+                        String(dados.usuario.id_usuario)
+                    );
+                }
+
+                if (dados.usuario.nome) {
+                    await AsyncStorage.setItem(
+                        "@psicodaily_nome",
+                        dados.usuario.nome
+                    );
+                }
+
+                if (dados.usuario.email) {
+                    await AsyncStorage.setItem(
+                        "@psicodaily_email",
+                        dados.usuario.email
+                    );
+                }
+
+                if (dados.usuario.tipo_usuario) {
+                    await AsyncStorage.setItem(
+                        "@psicodaily_tipo_usuario",
+                        dados.usuario.tipo_usuario
+                    );
+                }
+            }
+
+            console.log("Login realizado com sucesso.");
+            console.log("Usuário:", dados.usuario);
+
+            navigation.replace("Dashboard");
+
+        } catch (error) {
+            console.log("Erro de conexão:", error);
+
+            Alert.alert(
+                "Erro de conexão",
+                "Não foi possível conectar ao Python. Confira se o celular e o computador estão na mesma rede e se o Flask está ligado."
+            );
+        } finally {
+            setCarregando(false);
+        }
+    };
+
+    const biometria = async () => {
+        try {
+            const temBiometria =
+                await LocalAuthentication.hasHardwareAsync();
+
+            if (!temBiometria) {
+                Alert.alert(
+                    "Biometria indisponível",
+                    "Este aparelho não possui suporte à biometria."
+                );
+                return;
+            }
+
+            const cadastrada =
+                await LocalAuthentication.isEnrolledAsync();
+
+            if (!cadastrada) {
+                Alert.alert(
+                    "Biometria não cadastrada",
+                    "Cadastre sua digital ou Face ID nas configurações do aparelho."
+                );
+                return;
+            }
+
+            const resultado =
+                await LocalAuthentication.authenticateAsync({
+                    promptMessage: "Entrar no Psicodaily",
+                    fallbackLabel: "Usar senha",
+                    cancelLabel: "Cancelar",
+                });
+
+            if (!resultado.success) {
+                return;
+            }
+
+            const token =
+                await AsyncStorage.getItem(
+                    "@psicodaily_token"
+                );
+
+            if (!token) {
+                Alert.alert(
+                    "Faça login primeiro",
+                    "Entre com seu e-mail e senha pelo menos uma vez para ativar o acesso por biometria."
+                );
+                return;
+            }
+
+            navigation.replace("Dashboard");
+
+        } catch (error) {
+            console.log("Erro biometria:", error);
+
+            Alert.alert(
+                "Erro",
+                "Não foi possível realizar a autenticação."
+            );
+        }
+    };
+
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={
+                Platform.OS === "ios"
+                    ? "padding"
+                    : undefined
+            }
+        >
+            <ScrollView
+                contentContainerStyle={styles.scroll}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={require("../assets/Logo.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+                </View>
 
+                <Text style={styles.titulo}>
+                    Bem-vindo ao PSICOdaily
+                </Text>
 
-            <View style={styles.card}>
-
-
-                <Image
-                    source={require("../assets/Logo.png")}
-                    style={styles.logo}
-                />
-
-
-                <View style={styles.linha} />
-
+                <Text style={styles.subtitulo}>
+                    Cuide da sua mente todos os dias.
+                </Text>
 
                 <View style={styles.formulario}>
-
-                    <Text style={styles.titulo}>
-                        Bem-vindo de volta
+                    <Text style={styles.label}>
+                        E-mail
                     </Text>
 
-                    <Text style={styles.subtitulo}>
-                        Acesse sua conta para continuar
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite seu e-mail"
+                        placeholderTextColor="#999"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+
+                    <Text style={styles.label}>
+                        Senha
                     </Text>
 
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite sua senha"
+                        placeholderTextColor="#999"
+                        value={senha}
+                        onChangeText={setSenha}
+                        secureTextEntry
+                    />
 
-                    <View style={styles.campo}>
-                        <Text style={styles.label}>
-                            E-mail
+                    <Pressable
+                        style={styles.esqueci}
+                        onPress={() =>
+                            navigation.navigate(
+                                "EsqueciSenha"
+                            )
+                        }
+                    >
+                        <Text style={styles.esqueciTexto}>
+                            Esqueci minha senha
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={[
+                            styles.botao,
+                            carregando &&
+                            styles.botaoDesativado,
+                        ]}
+                        onPress={realizarLogin}
+                        disabled={carregando}
+                    >
+                        <Text style={styles.botaoTexto}>
+                            {carregando
+                                ? "Entrando..."
+                                : "Entrar"}
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={styles.botaoBiometria}
+                        onPress={biometria}
+                    >
+                        <Text style={styles.biometriaTexto}>
+                            Entrar com biometria
+                        </Text>
+                    </Pressable>
+
+                    <View style={styles.cadastroContainer}>
+                        <Text style={styles.cadastroTexto}>
+                            Ainda não possui uma conta?
                         </Text>
 
-                        <TextInput
-                            style={styles.input}
-                            inputMode="email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
+                        <Pressable
+                            onPress={() =>
+                                navigation.navigate(
+                                    "Cadastro"
+                                )
+                            }
+                        >
+                            <Text style={styles.cadastroLink}>
+                                Cadastre-se
+                            </Text>
+                        </Pressable>
                     </View>
-
-
-                    <View style={styles.campo}>
-                        <Text style={styles.label}>
-                            Senha
-                        </Text>
-
-                        <TextInput
-                            style={styles.input}
-                            secureTextEntry={true}
-                        />
-                    </View>
-
-
-                    <Pressable
-                        style={styles.botaoLogin}
-                        onPress={() => {
-
-                        }}
-                    >
-                        <Text style={styles.textoLogin}>
-                            Login
-                        </Text>
-                    </Pressable>
-
-
-                    <Text style={styles.textoCadastro}>
-                        Não tem uma conta?
-                    </Text>
-
-                    <Pressable
-                        onPress={() => navigation.navigate("Cadastro")}
-                    >
-                        <Text style={styles.linkCadastro}>
-                            Cadastre-se!
-                        </Text>
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() => navigation.navigate("EsqueciSenha")}
-                    >
-                        <Text style={styles.linkEsqueci}>
-                            Esqueci Minha Senha
-                        </Text>
-                    </Pressable>
-
                 </View>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         backgroundColor: "#E1F3FF",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 12,
     },
 
-    card: {
-        width: "100%",
-        maxWidth: 380,
-        minHeight: 575,
-        backgroundColor: "#FFFFFF",
-        borderRadius: 12,
-        paddingHorizontal: 20,
-        paddingTop: 18,
-        paddingBottom: 25,
+    scroll: {
+        flexGrow: 1,
+        justifyContent: "center",
+        padding: 25,
+    },
 
-
-        elevation: 5,
-
-
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 3,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
+    logoContainer: {
+        alignItems: "center",
+        marginBottom: 15,
     },
 
     logo: {
-        width: "75%",
-        height: 48,
-        resizeMode: "contain",
-        alignSelf: "center",
-    },
-
-    linha: {
-        height: 1,
-        backgroundColor: "#004BAD",
-        width: "85%",
-        alignSelf: "center",
-        marginTop: 8,
-        marginBottom: 34,
-    },
-
-    formulario: {
-        borderWidth: 1,
-        borderColor: "#004BAD",
-        borderRadius: 12,
-        paddingHorizontal: 14,
-        paddingTop: 40,
-        paddingBottom: 58,
-        minHeight: 448,
+        width: 150,
+        height: 100,
     },
 
     titulo: {
-        fontFamily: "Poppins",
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#20232B",
+        fontSize: 25,
+        fontWeight: "700",
+        color: "#004BAD",
         textAlign: "center",
+        marginBottom: 8,
     },
 
     subtitulo: {
-        fontFamily: "Poppins",
-        fontSize: 12,
-        color: "#414158",
+        fontSize: 15,
+        color: "#666",
         textAlign: "center",
-        marginTop: 4,
-        marginBottom: 29,
+        marginBottom: 30,
     },
 
-    campo: {
-        marginBottom: 11,
+    formulario: {
+        width: "100%",
     },
 
     label: {
-        fontFamily: "Poppins",
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: "600",
-        color: "#333333",
-        marginLeft: 2,
-        marginBottom: 5,
+        color: "#004BAD",
+        marginBottom: 7,
     },
 
     input: {
-        height: 38,
+        width: "100%",
+        height: 52,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        fontSize: 15,
+        marginBottom: 18,
         borderWidth: 1,
         borderColor: "#004BAD",
-        borderRadius: 22,
-        paddingHorizontal: 14,
-        fontFamily: "Poppins",
-        fontSize: 13,
-        color: "#333333",
     },
 
-    botaoLogin: {
-        height: 41,
+    esqueci: {
+        alignItems: "flex-end",
+        marginBottom: 20,
+    },
+
+    esqueciTexto: {
+        color: "#004BAD",
+        fontSize: 14,
+        fontWeight: "600",
+    },
+
+    botao: {
+        width: "100%",
+        height: 52,
+        borderRadius: 12,
         backgroundColor: "#004BAD",
-        borderRadius: 22,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 33,
     },
 
-    textoLogin: {
+    botaoDesativado: {
+        opacity: 0.6,
+    },
+
+    botaoTexto: {
         color: "#FFFFFF",
-        fontFamily: "Poppins",
-        fontSize: 20,
-        fontWeight: "bold",
+        fontSize: 16,
+        fontWeight: "700",
     },
 
-    textoCadastro: {
-        color: "#333333",
-        fontFamily: "Poppins",
-        fontSize: 11,
-        fontWeight: "600",
-        textAlign: "center",
-        marginTop: 11,
+    botaoBiometria: {
+        width: "100%",
+        height: 52,
+        borderRadius: 12,
+        borderWidth: 1.5,
+        borderColor: "#004BAD",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 12,
     },
 
-    linkCadastro: {
+    biometriaTexto: {
         color: "#004BAD",
-        fontFamily: "Poppins",
-        fontSize: 11,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginTop: 1,
+        fontSize: 15,
+        fontWeight: "600",
     },
 
-    linkEsqueci: {
-        color: "#A8A8A8",
-        fontFamily: "Poppins",
-        fontSize: 11,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginTop: 1,
-        textDecorationLine: "underline",
-    }
+    cadastroContainer: {
+        alignItems: "center",
+        marginTop: 25,
+    },
 
+    cadastroTexto: {
+        color: "#666",
+        fontSize: 14,
+    },
+
+    cadastroLink: {
+        color: "#004BAD",
+        fontSize: 14,
+        fontWeight: "700",
+        marginTop: 5,
+    },
 });
