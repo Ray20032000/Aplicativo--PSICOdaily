@@ -35,10 +35,7 @@ export default function Cadastro({ navigation }) {
     const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
 
     const [carregando, setCarregando] = useState(false);
-
-    // =========================================================
-    // FORMATAÇÕES
-    // =========================================================
+    
 
     const formatarCPF = (texto) => {
 
