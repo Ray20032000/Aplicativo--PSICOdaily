@@ -1,4 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
+import { fetch } from "expo/fetch";
+import { File } from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 
@@ -16,7 +18,7 @@ import {
     ScrollView,
 } from "react-native";
 
-const API_URL = "https://p01--psicodaily-api--zfhqcbfx5v8.code.run";
+const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
 
 export default function Cadastro({ navigation }) {
 
@@ -34,8 +36,15 @@ export default function Cadastro({ navigation }) {
 
     const [carregando, setCarregando] = useState(false);
 
+    // =========================================================
+    // FORMATAÇÕES
+    // =========================================================
+
     const formatarCPF = (texto) => {
-        const numeros = texto.replace(/\D/g, "").slice(0, 11);
+
+        const numeros = texto
+            .replace(/\D/g, "")
+            .slice(0, 11);
 
         if (numeros.length <= 3) {
             return numeros;
@@ -62,7 +71,10 @@ export default function Cadastro({ navigation }) {
     };
 
     const formatarTelefone = (texto) => {
-        const numeros = texto.replace(/\D/g, "").slice(0, 11);
+
+        const numeros = texto
+            .replace(/\D/g, "")
+            .slice(0, 11);
 
         if (numeros.length <= 2) {
             return numeros;
@@ -81,8 +93,13 @@ export default function Cadastro({ navigation }) {
         );
     };
 
+    // =========================================================
+    // VALIDAÇÃO DA SENHA
+    // =========================================================
+
     const senhaTem8Caracteres =
-        senha.length >= 8 && senha.length <= 12;
+        senha.length >= 8 &&
+        senha.length <= 12;
 
     const senhaTemMaiuscula =
         /[A-Z]/.test(senha);
@@ -107,6 +124,10 @@ export default function Cadastro({ navigation }) {
         senha.length > 0 &&
         confirmarSenha.length > 0 &&
         senha === confirmarSenha;
+
+    // =========================================================
+    // ESCOLHER FOTO
+    // =========================================================
 
     const escolherFoto = async () => {
 
@@ -135,10 +156,15 @@ export default function Cadastro({ navigation }) {
 
             if (!resultado.canceled) {
 
-                setFotoPerfil(
-                    resultado.assets[0].uri
+                const uri =
+                    resultado.assets[0].uri;
+
+                console.log(
+                    "Foto selecionada:",
+                    uri
                 );
 
+                setFotoPerfil(uri);
             }
 
         } catch (error) {
@@ -154,6 +180,10 @@ export default function Cadastro({ navigation }) {
             );
         }
     };
+
+    // =========================================================
+    // CADASTRAR
+    // =========================================================
 
     const cadastrar = async () => {
 
@@ -226,6 +256,10 @@ export default function Cadastro({ navigation }) {
 
             const formData = new FormData();
 
+            // =================================================
+            // CAMPOS
+            // =================================================
+
             formData.append(
                 "nome",
                 nome.trim()
@@ -256,15 +290,40 @@ export default function Cadastro({ navigation }) {
                 confirmarSenha
             );
 
+            // =================================================
+            // FOTO
+            // =================================================
+
             if (fotoPerfil) {
+
+                console.log(
+                    "Preparando arquivo:",
+                    fotoPerfil
+                );
+
+                // O File recebe diretamente a URI
+                // retornada pelo ImagePicker.
+                const arquivo =
+                    new File(fotoPerfil);
+
+                console.log(
+                    "Arquivo:",
+                    arquivo.uri
+                );
+
+                console.log(
+                    "Tipo:",
+                    arquivo.type
+                );
+
+                console.log(
+                    "Tamanho:",
+                    arquivo.size
+                );
 
                 formData.append(
                     "imagem",
-                    {
-                        uri: fotoPerfil,
-                        name: "perfil.jpg",
-                        type: "image/jpeg",
-                    }
+                    arquivo
                 );
             }
 
@@ -273,6 +332,9 @@ export default function Cadastro({ navigation }) {
                 API_URL
             );
 
+            // IMPORTANTE:
+            // usamos fetch do expo/fetch
+            // e não o fetch padrão do React Native.
             const resposta = await fetch(
                 `${API_URL}/api/usuarios/`,
                 {
@@ -298,7 +360,8 @@ export default function Cadastro({ navigation }) {
 
             try {
 
-                dados = JSON.parse(texto);
+                dados =
+                    JSON.parse(texto);
 
             } catch {
 
@@ -306,6 +369,10 @@ export default function Cadastro({ navigation }) {
                     "O Python não retornou JSON."
                 );
             }
+
+            // =================================================
+            // ERRO DO SERVIDOR
+            // =================================================
 
             if (!resposta.ok) {
 
@@ -319,10 +386,18 @@ export default function Cadastro({ navigation }) {
                 return;
             }
 
+            // =================================================
+            // SALVAR E-MAIL
+            // =================================================
+
             await AsyncStorage.setItem(
                 "@psicodaily_email_cadastro",
                 email.trim()
             );
+
+            // =================================================
+            // SUCESSO
+            // =================================================
 
             Alert.alert(
                 "Cadastro realizado!",
@@ -336,7 +411,8 @@ export default function Cadastro({ navigation }) {
                             navigation.navigate(
                                 "AtivarConta",
                                 {
-                                    email: email.trim(),
+                                    email:
+                                        email.trim(),
                                 }
                             );
                         },
@@ -359,9 +435,12 @@ export default function Cadastro({ navigation }) {
         } finally {
 
             setCarregando(false);
-
         }
     };
+
+    // =========================================================
+    // INTERFACE
+    // =========================================================
 
     return (
 
@@ -403,6 +482,8 @@ export default function Cadastro({ navigation }) {
                             no PSICOdaily.
                         </Text>
 
+                        {/* NOME */}
+
                         <View style={styles.campo}>
 
                             <Text style={styles.label}>
@@ -420,6 +501,8 @@ export default function Cadastro({ navigation }) {
                             />
 
                         </View>
+
+                        {/* EMAIL */}
 
                         <View style={styles.campo}>
 
@@ -440,6 +523,8 @@ export default function Cadastro({ navigation }) {
                             />
 
                         </View>
+
+                        {/* TELEFONE */}
 
                         <View style={styles.campo}>
 
@@ -463,6 +548,8 @@ export default function Cadastro({ navigation }) {
 
                         </View>
 
+                        {/* CPF */}
+
                         <View style={styles.campo}>
 
                             <Text style={styles.label}>
@@ -484,6 +571,8 @@ export default function Cadastro({ navigation }) {
                             />
 
                         </View>
+
+                        {/* SENHA */}
 
                         <View style={styles.campo}>
 
@@ -526,6 +615,8 @@ export default function Cadastro({ navigation }) {
                             </View>
 
                         </View>
+
+                        {/* REQUISITOS */}
 
                         <View style={styles.requisitos}>
 
@@ -600,6 +691,8 @@ export default function Cadastro({ navigation }) {
 
                         </View>
 
+                        {/* CONFIRMAR SENHA */}
+
                         <View style={styles.campo}>
 
                             <Text style={styles.label}>
@@ -609,9 +702,11 @@ export default function Cadastro({ navigation }) {
                             <View
                                 style={[
                                     styles.inputSenha,
+
                                     confirmarSenha.length > 0 &&
                                     !senhasIguais &&
                                     styles.inputErro,
+
                                     senhasIguais &&
                                     styles.inputCorreto,
                                 ]}
@@ -667,6 +762,8 @@ export default function Cadastro({ navigation }) {
 
                         </View>
 
+                        {/* FOTO */}
+
                         <View style={styles.fotoContainer}>
 
                             <Pressable
@@ -692,14 +789,18 @@ export default function Cadastro({ navigation }) {
                             ) : (
 
                                 <View style={styles.fotoCirculo}>
+
                                     <Text style={styles.fotoIcone}>
                                         ●
                                     </Text>
+
                                 </View>
 
                             )}
 
                         </View>
+
+                        {/* CADASTRAR */}
 
                         <Pressable
                             style={[
@@ -736,6 +837,10 @@ export default function Cadastro({ navigation }) {
         </KeyboardAvoidingView>
     );
 }
+
+// =============================================================
+// ESTILOS
+// =============================================================
 
 const styles = StyleSheet.create({
 

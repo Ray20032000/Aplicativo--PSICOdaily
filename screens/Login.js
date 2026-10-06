@@ -36,38 +36,50 @@ export default function Login({ navigation }) {
 
             console.log(
                 "Tentando conectar em:",
-                `${API}/login`
+                `${API}/api/auth/login_mobile`
             );
 
-            const resposta = await fetch(`${API}/api/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email.trim(),
-                    senha: senha,
-                }),
-            });
+            const resposta = await fetch(
+                `${API}/api/auth/login_mobile`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email.trim(),
+                        senha: senha,
+                    }),
+                }
+            );
 
             const texto = await resposta.text();
 
-            console.log("Status:", resposta.status);
-            console.log("Resposta do Python:", texto);
+            console.log("Status HTTP:", resposta.status);
+            console.log("Resposta do servidor:", texto);
 
             let dados = {};
 
             try {
                 dados = texto ? JSON.parse(texto) : {};
-            } catch {
+            } catch (error) {
+                console.log(
+                    "Erro ao converter JSON:",
+                    error
+                );
+
                 Alert.alert(
                     "Erro no servidor",
-                    "O servidor não retornou uma resposta válida."
+                    "O servidor retornou uma resposta que não é um JSON válido."
                 );
+
                 return;
             }
 
+            console.log("Dados recebidos:", dados);
+
+            // Verifica se o servidor retornou erro HTTP
             if (!resposta.ok) {
                 Alert.alert(
                     "Não foi possível entrar",
@@ -75,22 +87,34 @@ export default function Login({ navigation }) {
                     dados.message ||
                     "Verifique seu e-mail e sua senha."
                 );
+
                 return;
             }
 
-            if (!dados.token) {
+            // O token vem dentro de dados.usuario
+            const token = dados.usuario?.token;
+
+            if (!token) {
+                console.log(
+                    "Resposta sem token:",
+                    dados
+                );
+
                 Alert.alert(
                     "Erro no login",
-                    "O servidor não enviou o token de acesso."
+                    "O servidor respondeu corretamente, mas não enviou o token de acesso."
                 );
+
                 return;
             }
 
+            // Salva o token
             await AsyncStorage.setItem(
                 "@psicodaily_token",
-                dados.token
+                token
             );
 
+            // Salva os dados do usuário
             if (dados.usuario) {
                 await AsyncStorage.setItem(
                     "@psicodaily_usuario",
@@ -126,22 +150,34 @@ export default function Login({ navigation }) {
                 }
             }
 
-            console.log("Login realizado com sucesso.");
-            console.log("Usuário:", dados.usuario);
+            console.log(
+                "Login realizado com sucesso."
+            );
 
-            navigation.replace("Dashboard");
+            console.log(
+                "Usuário:",
+                dados.usuario
+            );
+
+            // Vai para o Dashboard
+            navigation.replace("AppTabs", { screen: "Dashboard" });
 
         } catch (error) {
-            console.log("Erro de conexão:", error);
+            console.log(
+                "Erro de conexão:",
+                error
+            );
 
             Alert.alert(
                 "Erro de conexão",
-                "Não foi possível conectar ao Python. Confira se o celular e o computador estão na mesma rede e se o Flask está ligado."
+                "Não foi possível conectar ao servidor. Verifique sua conexão com a internet."
             );
         } finally {
             setCarregando(false);
         }
     };
+
+
 
     const biometria = async () => {
         try {
@@ -191,7 +227,7 @@ export default function Login({ navigation }) {
                 return;
             }
 
-            navigation.replace("Dashboard");
+            navigation.replace("AppTabs", { screen: "Dashboard" });
 
         } catch (error) {
             console.log("Erro biometria:", error);
