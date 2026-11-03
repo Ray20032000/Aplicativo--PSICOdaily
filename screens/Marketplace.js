@@ -37,8 +37,8 @@ function ehPsicologo(usuario) {
 
 function CardProfissional({ profissional, onPress }) {
     const nome = profissional.nome || profissional.nome_completo || "Psicólogo";
-    const foto = profissional.foto_perfil || profissional.foto || profissional.imagem || profissional.imagem_perfil;
-    const especialidade = profissional.especialidade || profissional.especialidades || profissional.abordagem;
+    const foto = profissional.foto_url || profissional.foto_perfil || profissional.foto || profissional.imagem || profissional.imagem_perfil;
+    const especialidade = profissional.especialidade || profissional.especialidades || profissional.abordagem || profissional.conselho_numero;
 
     return (
         <Pressable
@@ -78,7 +78,7 @@ export default function Marketplace() {
         setCarregando(true);
         setErro("");
         try {
-            const resposta = await fetch(`${API_URL}/api/usuarios/`, {
+            const resposta = await fetch(`${API_URL}/api/profissionais/`, {
                 headers: { Accept: "application/json" },
             });
             const texto = await resposta.text();
@@ -115,6 +115,7 @@ export default function Marketplace() {
                 profissional.especialidades,
                 profissional.abordagem,
                 profissional.crp,
+                profissional.conselho_numero,
                 profissional.cidade,
             ].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
             return texto.includes(termo);

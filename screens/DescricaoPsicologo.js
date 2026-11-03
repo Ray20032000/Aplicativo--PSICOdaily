@@ -1,212 +1,32 @@
-import { useMemo, useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
-import { ArrowLeft, CalendarPlus, UserRound } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator, Alert, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ArrowLeft, CalendarDays, Clock3, UserRound } from "lucide-react-native";
 
-const HORARIOS_SEMANA = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
-const HORARIOS_SABADO = ["08:00", "09:00", "10:00", "11:00"];
-
-function dataLocal(data) {
-    const ano = data.getFullYear();
-    const mes = String(data.getMonth() + 1).padStart(2, "0");
-    const dia = String(data.getDate()).padStart(2, "0");
-    return `${ano}-${mes}-${dia}`;
-}
-
-function moeda(valor) {
-    const numero = Number(valor);
-    return Number.isFinite(numero)
-        ? numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-        : "R$ 160,00";
-}
-
+const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const isoDay = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+const localDateTime = (date) => `${isoDay(date)}T${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+const dinheiro = (value) => Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export default function DescricaoPsicologo() {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const psicologo = route.params?.psicologo || {};
-    const nome = psicologo.nome || psicologo.nome_completo || "Psicólogo";
-    const foto = psicologo.foto_perfil || psicologo.foto || psicologo.imagem || psicologo.imagem_perfil;
-    const especialidade = psicologo.especialidade || psicologo.especialidades || psicologo.abordagem || "Atendimento psicológico";
-    const descricao = psicologo.descricao || psicologo.bio || psicologo.sobre || psicologo.apresentacao;
-    const valor = Number(psicologo.valor_consulta || psicologo.preco || psicologo.valor || 160);
-    const [dataSelecionada, setDataSelecionada] = useState(null);
-    const [horarioSelecionado, setHorarioSelecionado] = useState(null);
-    const [mostrarHorarios, setMostrarHorarios] = useState(false);
-
-    const diasDisponiveis = useMemo(() => Array.from({ length: 14 }, (_, indice) => {
-        const data = new Date();
-        data.setHours(12, 0, 0, 0);
-        data.setDate(data.getDate() + indice + 1);
-        return data;
-    }).filter((data) => data.getDay() !== 0), []);
-
-    const horarios = dataSelecionada
-        ? (new Date(`${dataSelecionada}T12:00:00`).getDay() === 6 ? HORARIOS_SABADO : HORARIOS_SEMANA)
-        : [];
-    const dataFormatada = dataSelecionada
-        ? new Date(`${dataSelecionada}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })
-        : "";
-
-    const irParaPagamento = () => {
-        if (!dataSelecionada || !horarioSelecionado) {
-            setMostrarHorarios(true);
-            return;
-        }
-        navigation.navigate("Pagamento", {
-            psicologo,
-            dataConsulta: dataSelecionada,
-            horarioConsulta: horarioSelecionado,
-            valorConsulta: valor,
-        });
-    };
-
-    return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
-                <Pressable onPress={() => navigation.goBack()} style={styles.voltar} accessibilityRole="button">
-                    <ArrowLeft color="#374151" size={20} />
-                    <Text style={styles.textoVoltar}>Voltar</Text>
-                </Pressable>
-
-                <View style={styles.cartao}>
-                    <View style={styles.cabecalhoPerfil}>
-                        {foto ? <Image source={{ uri: foto }} style={styles.foto} /> : (
-                            <View style={styles.fotoFallback}><UserRound color="#67718A" size={42} /></View>
-                        )}
-                        <View style={styles.dadosPerfil}>
-                            <Text style={styles.nome}>{nome}</Text>
-                            <Text style={styles.avaliacao}>☆☆☆☆☆</Text>
-                            <Text style={styles.especialidade}>Especialidades: {especialidade}</Text>
-                        </View>
-                        <View style={styles.notaBox}>
-                            <Text style={styles.nota}>☆ {psicologo.nota || psicologo.avaliacao || "5"}</Text>
-                            <Text style={styles.avaliacoes}>{psicologo.total_avaliacoes || 0} avaliações</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.divisor} />
-                    <Text style={styles.tituloSecao}>Sobre o profissional</Text>
-                    <Text style={styles.descricao}>{descricao || "Este profissional ainda não adicionou uma descrição."}</Text>
-                    {psicologo.crp ? <Text style={styles.detalhe}>CRP: {psicologo.crp}</Text> : null}
-                    {psicologo.anos_experiencia ? <Text style={styles.detalhe}>• {psicologo.anos_experiencia} anos de experiência</Text> : null}
-
-                    <View style={styles.secaoAgenda}>
-                        <View style={styles.tituloAgendaLinha}>
-                            <CalendarPlus color="#1683C4" size={19} />
-                            <Text style={styles.tituloSecao}>Agende sua consulta</Text>
-                        </View>
-                        <Text style={styles.instrucao}>Escolha uma data disponível:</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.diasLista}>
-                            {diasDisponiveis.map((dia) => {
-                                const chave = dataLocal(dia);
-                                const selecionado = dataSelecionada === chave;
-                                return (
-                                    <Pressable
-                                        key={chave}
-                                        onPress={() => { setDataSelecionada(chave); setHorarioSelecionado(null); }}
-                                        style={[styles.diaBotao, selecionado && styles.opcaoSelecionada]}
-                                    >
-                                        <Text style={[styles.diaSemana, selecionado && styles.textoSelecionado]}>
-                                            {dia.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "")}
-                                        </Text>
-                                        <Text style={[styles.diaNumero, selecionado && styles.textoSelecionado]}>{dia.getDate()}</Text>
-                                        <Text style={[styles.diaMes, selecionado && styles.textoSelecionado]}>
-                                            {dia.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
-                                        </Text>
-                                    </Pressable>
-                                );
-                            })}
-                        </ScrollView>
-
-                        {dataSelecionada ? (
-                            <>
-                                <Text style={styles.instrucao}>Horários para {dataFormatada}:</Text>
-                                <View style={styles.horariosLista}>
-                                    {horarios.map((horario) => {
-                                        const selecionado = horarioSelecionado === horario;
-                                        return (
-                                            <Pressable
-                                                key={horario}
-                                                onPress={() => setHorarioSelecionado(horario)}
-                                                style={[styles.horarioBotao, selecionado && styles.opcaoSelecionada]}
-                                            >
-                                                <Text style={[styles.textoHorario, selecionado && styles.textoSelecionado]}>{horario}</Text>
-                                            </Pressable>
-                                        );
-                                    })}
-                                </View>
-                            </>
-                        ) : null}
-                        {mostrarHorarios && (!dataSelecionada || !horarioSelecionado) ? (
-                            <Text style={styles.avisoSelecao}>Selecione a data e o horário antes de continuar.</Text>
-                        ) : null}
-                    </View>
-
-                    <View style={styles.rodapeCartao}>
-                        <Text style={styles.preco}>{moeda(valor)} / hora</Text>
-                        {dataSelecionada && horarioSelecionado ? (
-                            <Text style={styles.resumoSelecao}>{dataFormatada} às {horarioSelecionado}</Text>
-                        ) : null}
-                        <Pressable
-                            onPress={irParaPagamento}
-                            style={({ pressed }) => [styles.botaoAgendar, pressed && styles.pressionado]}
-                            accessibilityRole="button"
-                        >
-                            <Text style={styles.textoAgendar}>{dataSelecionada && horarioSelecionado ? "Ir para pagamento" : "Escolha data e horário"}</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
-    );
+  const navigation = useNavigation(); const route = useRoute(); const original = route.params?.psicologo || {}; const [profile, setProfile] = useState(original); const [slots, setSlots] = useState([]); const [day, setDay] = useState(""); const [slot, setSlot] = useState(null); const [loading, setLoading] = useState(true); const [booking, setBooking] = useState(false); const [joining, setJoining] = useState(false); const [waiting, setWaiting] = useState(false); const [error, setError] = useState("");
+  const id = profile.id_usuario || profile.id || profile.profissional_id;
+  const dates = useMemo(() => Array.from({ length: 14 }, (_, index) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + index); return d; }).filter((d) => d > new Date(new Date().setHours(0, 0, 0, 0))), []);
+  const load = useCallback(async () => { if (!id) { setError("Não foi possível identificar este profissional."); setLoading(false); return; } setLoading(true); try { const [token, detailResponse, slotsResponse] = await Promise.all([AsyncStorage.getItem("@psicodaily_token"), fetch(`${API}/api/profissionais/${id}`), fetch(`${API}/api/profissionais/${id}/horarios?de=${isoDay(new Date())}&ate=${isoDay(new Date(Date.now() + 13 * 86400000))}`)]); const detail = await detailResponse.json(); const schedule = await slotsResponse.json(); if (!detailResponse.ok) throw new Error(detail.error || "Não foi possível carregar o perfil profissional."); if (!slotsResponse.ok) throw new Error(schedule.error || "Não foi possível carregar os horários."); setProfile(detail.profissionais || original); setSlots(schedule.horarios || []); setDay((schedule.horarios || [])[0]?.inicio?.slice(0, 10) || ""); setError(""); } catch (e) { setError(e.message); } finally { setLoading(false); } }, [id]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
+  const doBooking = async () => { if (!slot) { Alert.alert("Escolha um horário", "Selecione uma data e um horário disponível."); return; } setBooking(true); try { const token = await AsyncStorage.getItem("@psicodaily_token"); const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` }; const sessionResponse = await fetch(`${API}/api/consultas/`, { method: "POST", headers, body: JSON.stringify({ id_profissional: Number(id), timestamp_inicio: slot.inicio, timestamp_fim: slot.fim }) }); const sessionData = await sessionResponse.json(); if (!sessionResponse.ok) throw new Error(sessionData.error || "Não foi possível agendar. O horário pode ter sido ocupado."); const billingResponse = await fetch(`${API}/api/pagamentos/cobranca`, { method: "POST", headers, body: JSON.stringify({ id_sessao: sessionData.sessao.sessao_id, metodo: "PIX" }) }); const billingData = await billingResponse.json(); if (!billingResponse.ok) { Alert.alert("Sessão agendada", billingData.error || "A sessão foi criada, mas não foi possível iniciar o pagamento."); navigation.navigate("AppTabs", { screen: "Sessões" }); return; } navigation.navigate("Pagamento", { idCobranca: billingData.cobranca.id_cobranca, psicologo: profile, inicio: slot.inicio, sessao: sessionData.sessao }); } catch (e) { Alert.alert("Não foi possível concluir", e.message); load(); } finally { setBooking(false); } };
+  const joinWaitlist = async () => { setJoining(true); try { const token = await AsyncStorage.getItem("@psicodaily_token"); const start = new Date(Date.now() + 5 * 60000); const end = new Date(start.getTime() + 30 * 86400000); const response = await fetch(`${API}/api/lista-espera/`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ id_profissional: Number(id), inicio: localDateTime(start), fim: localDateTime(end) }) }); const data = await response.json(); if (!response.ok) throw new Error(data.error || "Não foi possível entrar na lista de espera."); setWaiting(true); Alert.alert("Você está na lista de espera", "Vamos avisar se um horário abrir nos próximos 30 dias. A vaga não fica reservada."); } catch (e) { Alert.alert("Lista de espera", e.message); } finally { setJoining(false); } };
+  const nome = profile.nome || profile.nome_completo || "Profissional"; const image = profile.foto_url || profile.foto_perfil || profile.foto || profile.imagem; const availableDays = [...new Set(slots.map((item) => item.inicio.slice(0, 10)))]; const daySlots = slots.filter((item) => item.inicio.slice(0, 10) === day); const selectedDate = dates.find((d) => isoDay(d) === day);
+  return <SafeAreaView style={styles.page}><ScrollView contentContainerStyle={styles.content}><Pressable style={styles.back} onPress={() => navigation.goBack()}><ArrowLeft color="#315B7A" size={19} /><Text style={styles.backText}>Voltar</Text></Pressable>
+    <View style={styles.profile}>{image ? <Image source={{ uri: image }} style={styles.avatar} /> : <View style={styles.avatarFallback}><UserRound size={30} color="#6C8397" /></View>}<View style={{ flex: 1 }}><Text style={styles.name}>{nome}</Text><Text style={styles.specialty}>{profile.especialidade || profile.abordagem || "Psicologia clínica"}</Text><Text style={styles.rating}>★ {profile.nota || profile.avaliacao || "Novo perfil"} · {profile.total_avaliacoes || 0} avaliações</Text></View></View>
+    <Text style={styles.label}>Sobre o profissional</Text><Text style={styles.description}>{profile.descricao || profile.bio || "Conheça a abordagem deste profissional e escolha um horário para iniciar o atendimento."}</Text><View style={styles.priceRow}><Text style={styles.label}>Valor da sessão</Text><Text style={styles.price}>{dinheiro((profile.preco_centavos ?? profile.valor_centavos ?? (profile.valor_consulta || profile.preco || 0) * 100) / 100)}</Text></View>
+    <View style={styles.sectionHead}><CalendarDays size={18} color="#0875C9" /><Text style={styles.sectionTitle}>Escolha uma data</Text></View>
+    {loading ? <ActivityIndicator color="#0875C9" style={{ margin: 20 }} /> : error ? <Pressable onPress={load}><Text style={styles.error}>{error} · Toque para tentar novamente</Text></Pressable> : <>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.days}>{dates.map((date) => { const key = isoDay(date); const enabled = availableDays.includes(key); return <Pressable key={key} disabled={!enabled} onPress={() => { setDay(key); setSlot(null); }} style={[styles.day, day === key && styles.dayActive, !enabled && styles.dayDisabled]}><Text style={[styles.dayName, day === key && styles.activeText]}>{date.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "")}</Text><Text style={[styles.dayNumber, day === key && styles.activeText]}>{date.getDate()}</Text><Text style={[styles.dayMonth, day === key && styles.activeText]}>{date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</Text></Pressable>; })}</ScrollView>
+      {day ? <><Text style={styles.sectionTitle}>Horários disponíveis {selectedDate ? `· ${selectedDate.toLocaleDateString("pt-BR", { day: "numeric", month: "long" })}` : ""}</Text><View style={styles.times}>{daySlots.map((item) => { const value = item.inicio.slice(11, 16); const active = slot?.inicio === item.inicio; return <Pressable key={item.inicio} onPress={() => setSlot(item)} style={[styles.time, active && styles.timeActive]}><Clock3 size={14} color={active ? "white" : "#0875C9"} /><Text style={[styles.timeText, active && styles.activeText]}>{value}</Text></Pressable>; })}</View>{!daySlots.length ? <Text style={styles.empty}>Não há horários disponíveis nessa data.</Text> : null}</> : <Text style={styles.empty}>Este profissional ainda não disponibilizou horários.</Text>}
+      {!slots.length ? <Pressable disabled={joining || waiting} onPress={joinWaitlist} style={styles.waitlist}><Text style={styles.waitlistText}>{joining ? "Adicionando..." : waiting ? "Você está na lista de espera" : "Avisar se abrir um horário"}</Text></Pressable> : null}
+    </>}
+    <Pressable onPress={doBooking} disabled={booking || loading || !slot} style={[styles.submit, (!slot || booking) && styles.submitDisabled]}><Text style={styles.submitText}>{booking ? "Agendando e iniciando pagamento..." : "Agendar e pagar com Pix"}</Text></Pressable>
+  </ScrollView></SafeAreaView>;
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#E3F4FC" },
-    conteudo: { flexGrow: 1, alignItems: "center", paddingHorizontal: 12, paddingTop: 10, paddingBottom: 24 },
-    voltar: { width: "100%", maxWidth: 720, flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 8 },
-    textoVoltar: { color: "#374151", fontFamily: "Poppins", fontSize: 14 },
-    cartao: { width: "100%", maxWidth: 720, padding: 16, backgroundColor: "#FFFFFF", borderRadius: 18, elevation: 3, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.16, shadowRadius: 5 },
-    cabecalhoPerfil: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 12 },
-    foto: { width: 128, height: 150, borderRadius: 16, backgroundColor: "#E8EAF0" },
-    fotoFallback: { width: 128, height: 150, borderRadius: 16, backgroundColor: "#E8EAF0", alignItems: "center", justifyContent: "center" },
-    dadosPerfil: { flex: 1 },
-    nome: { color: "#686868", fontFamily: "Poppins", fontSize: 17 },
-    avaliacao: { color: "#888888", fontSize: 18, letterSpacing: -1, marginTop: -5 },
-    especialidade: { color: "#686868", fontFamily: "Poppins", fontSize: 14, lineHeight: 21, marginTop: 12 },
-    notaBox: { alignItems: "flex-end" },
-    nota: { color: "#333333", fontFamily: "Poppins", fontSize: 13 },
-    avaliacoes: { color: "#777777", fontFamily: "Poppins", fontSize: 10 },
-    divisor: { height: 1, backgroundColor: "#E8E8E8", marginVertical: 17 },
-    tituloSecao: { color: "#5D5D5D", fontFamily: "Poppins", fontSize: 15 },
-    descricao: { color: "#686868", fontFamily: "Poppins", fontSize: 14, lineHeight: 21, marginTop: 7 },
-    detalhe: { color: "#686868", fontFamily: "Poppins", fontSize: 13, marginTop: 9 },
-    secaoAgenda: { marginTop: 21, paddingTop: 16, borderTopWidth: 1, borderTopColor: "#E8E8E8" },
-    tituloAgendaLinha: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
-    instrucao: { color: "#686868", fontFamily: "Poppins", fontSize: 12, marginTop: 8, marginBottom: 8 },
-    diasLista: { gap: 8, paddingBottom: 4 },
-    diaBotao: { width: 58, minHeight: 73, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#D7DCE3", borderRadius: 11, backgroundColor: "#FFFFFF" },
-    diaSemana: { color: "#777F8D", fontFamily: "Poppins", fontSize: 10, textTransform: "capitalize" },
-    diaNumero: { color: "#343A46", fontFamily: "Poppins", fontSize: 16 },
-    diaMes: { color: "#777F8D", fontFamily: "Poppins", fontSize: 10, textTransform: "capitalize" },
-    opcaoSelecionada: { backgroundColor: "#1683C4", borderColor: "#1683C4" },
-    textoSelecionado: { color: "#FFFFFF" },
-    horariosLista: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-    horarioBotao: { minWidth: 67, minHeight: 38, justifyContent: "center", alignItems: "center", paddingHorizontal: 10, borderWidth: 1, borderColor: "#D7DCE3", borderRadius: 9 },
-    textoHorario: { color: "#454B57", fontFamily: "Poppins", fontSize: 12 },
-    avisoSelecao: { color: "#B45309", fontFamily: "Poppins", fontSize: 12, marginTop: 10 },
-    rodapeCartao: { marginTop: 22, alignItems: "center" },
-    preco: { color: "#5D5D5D", fontFamily: "Poppins", fontSize: 16 },
-    resumoSelecao: { color: "#777F8D", fontFamily: "Poppins", fontSize: 12, marginTop: 3, textTransform: "capitalize" },
-    botaoAgendar: { width: "100%", minHeight: 48, marginTop: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#1384C6", borderRadius: 11 },
-    textoAgendar: { color: "#FFFFFF", fontFamily: "Poppins", fontSize: 15 },
-    pressionado: { opacity: 0.8 },
-});
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: "#EAF5FC" }, content: { padding: 16, paddingBottom: 36 }, back: { flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 16 }, backText: { color: "#315B7A", fontSize: 13 }, profile: { backgroundColor: "white", borderRadius: 16, padding: 16, flexDirection: "row", gap: 12, alignItems: "center" }, avatar: { width: 68, height: 68, borderRadius: 34 }, avatarFallback: { width: 68, height: 68, borderRadius: 34, backgroundColor: "#E7EDF2", alignItems: "center", justifyContent: "center" }, name: { color: "#163B63", fontFamily: "Poppins", fontSize: 16 }, specialty: { color: "#526579", fontSize: 12, marginTop: 3 }, rating: { color: "#8190A0", fontSize: 10, marginTop: 5 }, label: { color: "#526579", fontSize: 12, fontFamily: "Poppins", marginTop: 18 }, description: { color: "#53677A", fontSize: 13, lineHeight: 20, marginTop: 5 }, priceRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "white", paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, marginTop: 14 }, price: { color: "#0759A8", fontFamily: "Poppins", fontSize: 16 }, sectionHead: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 22, marginBottom: 10 }, sectionTitle: { color: "#163B63", fontFamily: "Poppins", fontSize: 14, marginTop: 14 }, days: { gap: 8, paddingVertical: 8 }, day: { width: 60, height: 76, borderRadius: 13, backgroundColor: "white", borderWidth: 1, borderColor: "#D6E2EB", alignItems: "center", justifyContent: "center" }, dayActive: { backgroundColor: "#0759A8", borderColor: "#0759A8" }, dayDisabled: { opacity: 0.45 }, dayName: { color: "#718096", fontSize: 10, textTransform: "capitalize" }, dayNumber: { color: "#163B63", fontFamily: "Poppins", fontSize: 18 }, dayMonth: { color: "#718096", fontSize: 9, textTransform: "capitalize" }, times: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 11 }, time: { flexDirection: "row", gap: 6, borderWidth: 1, borderColor: "#BBD4E6", backgroundColor: "white", borderRadius: 10, paddingVertical: 10, paddingHorizontal: 13, alignItems: "center" }, timeActive: { backgroundColor: "#0759A8", borderColor: "#0759A8" }, timeText: { color: "#315B7A", fontSize: 12 }, activeText: { color: "white" }, empty: { color: "#718096", fontSize: 12, marginTop: 11 }, error: { color: "#B42318", marginVertical: 20 }, waitlist: { marginTop: 12, alignItems: "center", backgroundColor: "#E3F3FD", borderRadius: 11, padding: 12 }, waitlistText: { color: "#0759A8", fontFamily: "Poppins", fontSize: 12 }, submit: { backgroundColor: "#0759A8", borderRadius: 13, alignItems: "center", padding: 15, marginTop: 24 }, submitDisabled: { opacity: 0.55 }, submitText: { color: "white", fontFamily: "Poppins", fontSize: 13 } });

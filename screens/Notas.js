@@ -50,8 +50,8 @@ function textoRegistro(registro) {
 
 function humorDoRegistro(registro) {
     const humor = String(registro.humor || registro.emocao || registro.sentimento || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    if (humor.includes("feliz") || humor.includes("bem") || humor.includes("bom")) return { emoji: "☻", cor: "#DDF4E8", texto: "Bem" };
-    if (humor.includes("trist") || humor.includes("mal") || humor.includes("ansios") || humor.includes("dific")) return { emoji: "☹", cor: "#FFE1E1", texto: "Difícil" };
+    if (["excelente", "bom"].includes(humor)) return { emoji: "☻", cor: "#DDF4E8", texto: humor === "excelente" ? "Muito bem" : "Bem" };
+    if (["pessimo", "ruim"].includes(humor)) return { emoji: "☹", cor: "#FFE1E1", texto: humor === "pessimo" ? "Muito mal" : "Mal" };
     return { emoji: "●", cor: "#FFF0C7", texto: humor || "Neutro" };
 }
 
@@ -69,8 +69,8 @@ function formatarData(data) {
 function RegistroCard({ registro }) {
     const data = dataDoRegistro(registro);
     const humor = humorDoRegistro(registro);
-    const sono = registro.horas_sono || registro.sono || registro.duracao_sono;
-    const atividade = registro.atividade || registro.atividade_fisica || registro.pratica;
+    const sono = registro.minutos_sono != null ? `${(registro.minutos_sono / 60).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}h` : registro.horas_sono || registro.sono || registro.duracao_sono;
+    const atividade = registro.exercicio_fisico ? "Atividade física" : null;
     const alimentacao = Array.isArray(registro.alimentacao) ? registro.alimentacao.join(", ") : registro.alimentacao;
 
     return (
@@ -112,7 +112,7 @@ export default function Notas() {
                 ]);
                 if (!token) throw new Error("Entre na sua conta para ver os registros do diário.");
                 const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : {};
-                const resposta = await fetch(`${API_URL}/api/diario/`, {
+                const resposta = await fetch(`${API_URL}/api/registros/`, {
                     headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
                 });
                 const texto = await resposta.text();

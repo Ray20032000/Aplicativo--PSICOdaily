@@ -6,6 +6,7 @@ import {
     Pressable,
     Image,
     Dimensions,
+    ScrollView,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -14,7 +15,7 @@ export default function TelaInicial() {
     const navigation = useNavigation();
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.conteudo} showsVerticalScrollIndicator={false}>
 
 
             <Image
@@ -118,7 +119,20 @@ export default function TelaInicial() {
                 </Text>
             </View>
 
-        </View>
+            <View style={styles.linksInstitucionais}>
+                <Pressable onPress={() => navigation.navigate("Institucional", { pagina: "QuemSomos" })}>
+                    <Text style={styles.linkInstitucional}>Quem somos</Text>
+                </Pressable>
+                <Text style={styles.separadorInstitucional}>·</Text>
+                <Pressable onPress={() => navigation.navigate("Institucional", { pagina: "Contato" })}>
+                    <Text style={styles.linkInstitucional}>Contato</Text>
+                </Pressable>
+            </View>
+            <Pressable onPress={() => navigation.navigate("CadastroProfissional")}>
+                <Text style={styles.linkInstitucional}>Sou psicólogo(a) ou psiquiatra</Text>
+            </Pressable>
+
+        </ScrollView>
     );
 }
 
@@ -127,9 +141,26 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#E1F3FF",
+    },
+    conteudo: {
         alignItems: "center",
         paddingHorizontal: 20,
+        paddingBottom: 18,
     },
+    linksInstitucionais: {
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
+        marginTop: 4,
+        marginBottom: 10,
+    },
+    linkInstitucional: {
+        color: "#0759A8",
+        fontSize: 11,
+        fontFamily: "Poppins",
+        textDecorationLine: "underline",
+    },
+    separadorInstitucional: { color: "#708090" },
 
     logo: {
         width: width * 0.65,

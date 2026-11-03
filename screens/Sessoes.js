@@ -12,7 +12,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { CalendarPlus, Video } from "lucide-react-native";
+import { CalendarPlus, Video, Star } from "lucide-react-native";
 
 const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
 
@@ -26,7 +26,7 @@ function extrairConsultas(dados) {
 }
 
 function dataDaConsulta(consulta) {
-    const data = consulta.data_consulta || consulta.data_agendamento || consulta.data || consulta.data_hora || consulta.datetime || consulta.inicio;
+    const data = consulta.data_hora_inicio || consulta.data_consulta || consulta.data_agendamento || consulta.data || consulta.data_hora || consulta.datetime || consulta.inicio;
     if (!data) return null;
 
     let dataTexto = String(data).trim();
@@ -66,6 +66,7 @@ function foiCancelada(consulta) {
 function nomeDoProfissional(consulta) {
     return consulta.psicologo?.nome
         || consulta.profissional?.nome
+        || consulta.profissional_nome
         || consulta.nome_psicologo
         || consulta.nome_profissional
         || consulta.psicologo_nome
@@ -85,12 +86,15 @@ function formatarDia(data) {
     });
 }
 
-function SessaoCard({ consulta, onEntrar }) {
+function SessaoCard({ consulta, onEntrar, onCancelar, onAvaliar }) {
     const data = dataDaConsulta(consulta);
     const hoje = data.toDateString() === new Date().toDateString();
     const link = linkDaConsulta(consulta);
     const hora = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    const status = String(consulta.status || consulta.estado || "").toLowerCase();
+    const statusOriginal = String(consulta.status || consulta.estado || "");
+    const status = statusOriginal.toUpperCase();
+    const podeCancelar = !["CANCELADO", "REALIZADO"].includes(status) && data.getTime() - Date.now() > 15 * 60 * 1000;
+    const podeEntrar = hoje && link && Date.now() >= data.getTime() - 15 * 60 * 1000 && status !== "CANCELADO";
 
     return (
         <View style={[styles.cardSessao, hoje && styles.cardHoje]}>
@@ -99,16 +103,20 @@ function SessaoCard({ consulta, onEntrar }) {
                 <Text style={styles.textoSessao}>{formatarDia(data)}</Text>
                 <Text style={styles.textoSessao}>{hora}</Text>
                 <Text style={styles.textoSessao} numberOfLines={1}>{nomeDoProfissional(consulta)}</Text>
-                {status && !["agendada", "marcada", "confirmada"].includes(status) ? (
-                    <Text style={styles.statusSessao}>{consulta.status || consulta.estado}</Text>
+                {status && status !== "AGENDADA" ? (
+                    <Text style={styles.statusSessao}>{statusOriginal}</Text>
                 ) : null}
             </View>
-            {hoje && link ? (
+            {podeEntrar ? (
                 <Pressable onPress={() => onEntrar(link)} style={styles.botaoEntrar} accessibilityRole="button">
                     <Video color="#FFFFFF" size={15} />
                     <Text style={styles.textoEntrar}>Entrar agora</Text>
                 </Pressable>
             ) : null}
+            {podeCancelar || (status === "REALIZADO" && consulta.nota_avaliacao == null) ? <View style={styles.acoesSessao}>
+                {podeCancelar ? <Pressable onPress={() => onCancelar(consulta)} style={styles.botaoSecundario}><Text style={styles.textoAcao}>Cancelar</Text></Pressable> : null}
+                {status === "REALIZADO" && consulta.nota_avaliacao == null ? <Pressable onPress={() => onAvaliar(consulta)} style={styles.botaoSecundario}><Star size={13} color="#0875C9" /><Text style={styles.textoAcao}>Avaliar</Text></Pressable> : null}
+            </View> : null}
         </View>
     );
 }
@@ -119,6 +127,7 @@ export default function Sessoes() {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState("");
     const [refreshKey, setRefreshKey] = useState(0);
+    const [, setSalvandoAcao] = useState(false);
 
     useFocusEffect(useCallback(() => {
         let ativo = true;
@@ -154,7 +163,7 @@ export default function Sessoes() {
                 if (!Array.isArray(lista)) throw new Error("O formato da lista de sessões retornada pelo servidor é inválido.");
                 const idUsuario = usuario.id_usuario ?? usuario.id ?? idSalvo;
                 const resultado = lista
-                    .filter((consulta) => !foiCancelada(consulta) && pertenceAoUsuario(consulta, idUsuario) && dataDaConsulta(consulta))
+                    .filter((consulta) => pertenceAoUsuario(consulta, idUsuario) && dataDaConsulta(consulta))
                     .sort((a, b) => {
                         const agora = new Date();
                         const dataA = dataDaConsulta(a);
@@ -192,6 +201,38 @@ export default function Sessoes() {
         }
     };
 
+    const cancelarSessao = (consulta) => Alert.alert("Cancelar sessão?", "A política de reembolso depende do horário do atendimento.", [
+        { text: "Manter sessão", style: "cancel" },
+        { text: "Cancelar", style: "destructive", onPress: async () => {
+            try {
+                setSalvandoAcao(true);
+                const token = await AsyncStorage.getItem("@psicodaily_token");
+                const id = consulta.sessao_id || consulta.id_sessao || consulta.id_consulta || consulta.id;
+                const response = await fetch(`${API_URL}/api/consultas/${id}/cancelar`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.error || "Não foi possível cancelar a sessão.");
+                Alert.alert("Sessão cancelada", payload.reembolso_centavos ? `A equipe processará o reembolso de ${(payload.reembolso_centavos / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}.` : "Sua sessão foi cancelada.");
+                setRefreshKey((value) => value + 1);
+            } catch (error) { Alert.alert("Cancelamento não concluído", error.message); }
+            finally { setSalvandoAcao(false); }
+        } },
+    ]);
+
+    const avaliarSessao = (consulta) => Alert.alert("Como foi sua sessão?", "Escolha uma nota de 1 a 5 estrelas.", [1, 2, 3, 4, 5].map((nota) => ({ text: `${"★".repeat(nota)}`, onPress: async () => {
+        try {
+            setSalvandoAcao(true);
+            const token = await AsyncStorage.getItem("@psicodaily_token");
+            const id = consulta.sessao_id || consulta.id_sessao || consulta.id_consulta || consulta.id;
+            const response = await fetch(`${API_URL}/api/consultas/${id}/avaliacao`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ nota }) });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.error || "Não foi possível enviar sua avaliação.");
+            Alert.alert("Obrigado pela avaliação", "Sua opinião ajuda outros pacientes.");
+            setRefreshKey((value) => value + 1);
+        } catch (error) { Alert.alert("Avaliação não enviada", error.message); }
+        finally { setSalvandoAcao(false); }
+    } })),
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.pagina}>
@@ -211,8 +252,8 @@ export default function Sessoes() {
                 ) : (
                     <FlatList
                         data={sessoes}
-                        keyExtractor={(item, index) => String(item.id_consulta || item.id_sessao || item.id || `${dataDaConsulta(item)?.toISOString()}-${index}`)}
-                        renderItem={({ item }) => <SessaoCard consulta={item} onEntrar={entrarNaSessao} />}
+                        keyExtractor={(item, index) => String(item.sessao_id || item.id_consulta || item.id_sessao || item.id || `${dataDaConsulta(item)?.toISOString()}-${index}`)}
+                        renderItem={({ item }) => <SessaoCard consulta={item} onEntrar={entrarNaSessao} onCancelar={cancelarSessao} onAvaliar={avaliarSessao} />}
                         contentContainerStyle={sessoes.length ? styles.lista : styles.listaVazia}
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={<Text style={styles.mensagemEstado}>Você ainda não tem sessões agendadas.</Text>}
@@ -239,7 +280,7 @@ const styles = StyleSheet.create({
     subtituloPagina: { color: "#667085", fontFamily: "Poppins", fontSize: 11, marginHorizontal: 2, marginBottom: 10 },
     lista: { gap: 7, paddingBottom: 10 },
     listaVazia: { flexGrow: 1, alignItems: "center", justifyContent: "center", paddingBottom: 30 },
-    cardSessao: { minHeight: 74, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 8, paddingHorizontal: 10, borderWidth: 1, borderColor: "#49A5FF", borderRadius: 12, backgroundColor: "#FFFFFF" },
+    cardSessao: { minHeight: 74, flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", paddingVertical: 8, paddingHorizontal: 10, borderWidth: 1, borderColor: "#49A5FF", borderRadius: 12, backgroundColor: "#FFFFFF" },
     cardHoje: { backgroundColor: "#DCEEFF", borderColor: "#2484D1" },
     dadosSessao: { flex: 1, paddingRight: 8 },
     tituloSessao: { color: "#0068C9", fontFamily: "Poppins", fontSize: 13 },
@@ -247,6 +288,9 @@ const styles = StyleSheet.create({
     statusSessao: { color: "#667085", fontFamily: "Poppins", fontSize: 9, marginTop: 2, textTransform: "capitalize" },
     botaoEntrar: { minHeight: 34, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, paddingHorizontal: 8, backgroundColor: "#2474B5", borderRadius: 7 },
     textoEntrar: { color: "#FFFFFF", fontFamily: "Poppins", fontSize: 10 },
+    acoesSessao: { width: "100%", flexDirection: "row", justifyContent: "flex-end", gap: 8, marginTop: 8 },
+    botaoSecundario: { flexDirection: "row", alignItems: "center", gap: 4, paddingVertical: 6, paddingHorizontal: 9, backgroundColor: "#EAF5FC", borderRadius: 8 },
+    textoAcao: { color: "#315B7A", fontSize: 10, fontFamily: "Poppins" },
     estado: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20 },
     mensagemEstado: { color: "#667085", fontFamily: "Poppins", fontSize: 13, textAlign: "center" },
     mensagemErro: { color: "#A33D3D", fontFamily: "Poppins", fontSize: 12, textAlign: "center" },

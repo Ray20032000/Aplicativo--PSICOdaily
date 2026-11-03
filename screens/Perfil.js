@@ -10,8 +10,10 @@ import {
     ScrollView,
     SafeAreaView,
     ActivityIndicator,
+    TextInput,
+    Alert,
 } from "react-native";
-import { ArrowLeft, KeyRound, Pencil, UserRound } from "lucide-react-native";
+import { ArrowLeft, KeyRound, Pencil, UserRound, LogOut } from "lucide-react-native";
 
 const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
 
@@ -30,6 +32,43 @@ export default function Perfil() {
     const [usuario, setUsuario] = useState({});
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState("");
+    const [editando, setEditando] = useState(false);
+    const [rascunho, setRascunho] = useState({});
+    const [salvando, setSalvando] = useState(false);
+
+    const salvarPerfil = async () => {
+        try {
+            setSalvando(true);
+            const token = await AsyncStorage.getItem("@psicodaily_token");
+            const response = await fetch(`${API_URL}/api/usuarios/me`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ nome: rascunho.nome, email: rascunho.email, telefone: rascunho.telefone }),
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(payload.error || "Não foi possível atualizar o perfil.");
+            const atualizado = { ...usuario, ...rascunho };
+            setUsuario(atualizado);
+            await AsyncStorage.setItem("@psicodaily_usuario", JSON.stringify(atualizado));
+            if (atualizado.nome) await AsyncStorage.setItem("@psicodaily_nome", atualizado.nome);
+            if (atualizado.email) await AsyncStorage.setItem("@psicodaily_email", atualizado.email);
+            setEditando(false);
+            Alert.alert("Perfil atualizado", "Seus dados foram salvos.");
+        } catch (error) { Alert.alert("Não foi possível salvar", error.message); }
+        finally { setSalvando(false); }
+    };
+
+    const sair = async () => {
+        try {
+            const token = await AsyncStorage.getItem("@psicodaily_token");
+            await fetch(`${API_URL}/api/usuarios/logout`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+        } catch { /* O encerramento local continua mesmo sem rede. */ }
+        await AsyncStorage.multiRemove([
+            "@psicodaily_token", "@psicodaily_usuario", "@psicodaily_id_usuario",
+            "@psicodaily_nome", "@psicodaily_email", "@psicodaily_tipo_usuario",
+        ]);
+        navigation.getParent()?.getParent()?.reset({ index: 0, routes: [{ name: "Login" }] });
+    };
 
     useFocusEffect(
         useCallback(() => {
@@ -57,7 +96,7 @@ export default function Perfil() {
                     }
 
                     if (token && idUsuario) {
-                        const resposta = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(idUsuario)}`, {
+                        const resposta = await fetch(`${API_URL}/api/usuarios/me`, {
                             headers: {
                                 Accept: "application/json",
                                 Authorization: `Bearer ${token}`,
@@ -83,7 +122,7 @@ export default function Perfil() {
                             await AsyncStorage.setItem("@psicodaily_usuario", JSON.stringify(dados));
                             if (dados.nome) await AsyncStorage.setItem("@psicodaily_nome", dados.nome);
                             if (dados.email) await AsyncStorage.setItem("@psicodaily_email", dados.email);
-                            if (ativo) setUsuario(dados);
+                            if (ativo) { setUsuario(dados); setRascunho(dados); }
                         }
                     }
                 } catch (error) {
@@ -146,6 +185,12 @@ export default function Perfil() {
                     {erro ? <Text style={styles.erro}>{erro}</Text> : null}
 
                     <View style={styles.divisor} />
+                    {editando ? <View style={{ width: "100%", gap: 10, marginTop: 14 }}>
+                        {[["Nome", "nome"], ["E-mail", "email"], ["Telefone", "telefone"]].map(([rotulo, campo]) => <View key={campo} style={styles.infoGrupo}>
+                            <Text style={styles.rotulo}>{rotulo}</Text>
+                            <TextInput value={String(rascunho[campo] || "")} onChangeText={(valor) => setRascunho((atual) => ({ ...atual, [campo]: valor }))} style={styles.campoEdicao} autoCapitalize={campo === "email" ? "none" : "words"} keyboardType={campo === "email" ? "email-address" : campo === "telefone" ? "phone-pad" : "default"} />
+                        </View>)}
+                    </View> : null}
                     {informacoes.map(([rotulo, valor]) => (
                         <View style={styles.infoGrupo} key={rotulo}>
                             <Text style={styles.rotulo}>{rotulo}</Text>
@@ -164,13 +209,14 @@ export default function Perfil() {
                         </Pressable>
                         <Pressable
                             accessibilityRole="button"
-                            onPress={() => {}}
+                            onPress={() => { setRascunho(usuario); setEditando((atual) => !atual); }}
                             style={({ pressed }) => [styles.botao, styles.botaoEditar, pressed && styles.pressionado]}
                         >
                             <Pencil color="#FFFFFF" size={18} />
-                            <Text style={styles.textoEditar}>Editar</Text>
+                            <Text style={styles.textoEditar}>{editando ? "Cancelar" : "Editar"}</Text>
                         </Pressable>
                     </View>
+                    {editando ? <Pressable accessibilityRole="button" onPress={salvarPerfil} disabled={salvando} style={[styles.botaoSenha, { backgroundColor: "#0875C9" }]}><Text style={[styles.textoBotaoSenha, { color: "white" }]}>{salvando ? "Salvando..." : "Salvar alterações"}</Text></Pressable> : null}
                     <Pressable
                         accessibilityRole="button"
                         onPress={() => navigation.navigate("EsqueciSenha", { email: usuario.email === "Não informado" ? "" : usuario.email })}
@@ -178,6 +224,10 @@ export default function Perfil() {
                     >
                         <KeyRound color="#5965A8" size={18} />
                         <Text style={styles.textoBotaoSenha}>Mudar senha</Text>
+                    </Pressable>
+                    <Pressable accessibilityRole="button" onPress={sair} style={({ pressed }) => [styles.botaoSenha, pressed && styles.pressionado]}>
+                        <LogOut color="#B42318" size={18} />
+                        <Text style={[styles.textoBotaoSenha, { color: "#B42318" }]}>Sair da conta</Text>
                     </Pressable>
                 </View>
             </ScrollView>
@@ -286,6 +336,17 @@ const styles = StyleSheet.create({
         color: "#252B3B",
         fontFamily: "Poppins",
         fontSize: 15,
+    },
+    campoEdicao: {
+        minHeight: 44,
+        borderWidth: 1,
+        borderColor: "#D5E1EA",
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        color: "#252B3B",
+        fontFamily: "Poppins",
+        fontSize: 14,
+        backgroundColor: "#FFFFFF",
     },
     acoes: {
         width: "100%",

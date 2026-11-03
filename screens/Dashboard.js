@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
@@ -54,6 +55,10 @@ function notaHumor(registro) {
     if (typeof valor === "number") return Math.max(1, Math.min(5, valor));
     if (valor != null && valor !== "" && Number.isFinite(Number(valor))) return Math.max(1, Math.min(5, Number(valor)));
     const humor = String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    if (humor === "pessimo") return 1;
+    if (humor === "ruim") return 2;
+    if (humor === "bom") return 4;
+    if (humor === "excelente") return 5;
     if (humor.includes("muito_mal") || humor.includes("muito mal")) return 1;
     if (humor === "mal" || humor.includes("dificil") || humor.includes("trist") || humor.includes("ansios")) return 2;
     if (humor.includes("neutro") || humor.includes("mais ou menos")) return 3;
@@ -91,7 +96,7 @@ function montarGraficoHumor(registros) {
 }
 
 function dataDaConsulta(consulta) {
-    const data = consulta.data_consulta || consulta.data_agendamento || consulta.data || consulta.data_hora || consulta.datetime || consulta.inicio;
+    const data = consulta.data_hora_inicio || consulta.data_consulta || consulta.data_agendamento || consulta.data || consulta.data_hora || consulta.datetime || consulta.inicio;
     if (!data) return null;
 
     const stringData = String(data).trim();
@@ -122,6 +127,7 @@ function statusCanceladoOuFinalizado(consulta) {
 function nomeDoProfissional(consulta) {
     return consulta.psicologo?.nome
         || consulta.profissional?.nome
+        || consulta.profissional_nome
         || consulta.nome_psicologo
         || consulta.nome_profissional
         || consulta.psicologo_nome
@@ -137,6 +143,7 @@ function formatarDataConsulta(data) {
 }
 
 export default function Dashboard() {
+    const navigation = useNavigation();
     const [usuario, setUsuario] = useState({ nome: "", foto: null });
     const [proximaConsulta, setProximaConsulta] = useState(null);
     const [carregandoConsulta, setCarregandoConsulta] = useState(true);
@@ -178,7 +185,7 @@ export default function Dashboard() {
 
                     const idUsuario = dados.id_usuario ?? dados.id ?? idSalvo;
                     try {
-                        const respostaDiario = await fetch(`${API_URL}/api/diario/`, {
+                        const respostaDiario = await fetch(`${API_URL}/api/registros/`, {
                             headers: {
                                 Accept: "application/json",
                                 Authorization: `Bearer ${token}`,
@@ -327,6 +334,10 @@ export default function Dashboard() {
                 {/* ========================= */}
                 {/* PRÓXIMA SESSÃO */}
                 {/* ========================= */}
+
+                <Pressable style={styles.recursos} onPress={() => navigation.navigate("Portal")}>
+                    <Text style={styles.recursosTexto}>Ver todos os recursos do Psicodaily  ›</Text>
+                </Pressable>
 
                 <View style={styles.proximaSessao}>
                     <View style={styles.dadosConsulta}>
@@ -508,7 +519,7 @@ export default function Dashboard() {
             {/* BOTÃO FLUTUANTE */}
             {/* ========================= */}
 
-            <Pressable style={styles.chat}>
+            <Pressable style={styles.chat} onPress={() => navigation.navigate("Mensagens")} accessibilityRole="button" accessibilityLabel="Abrir mensagens">
 
                 <MessageCircle
                     size={24}
@@ -634,6 +645,18 @@ const styles = StyleSheet.create({
     /* PERGUNTA */
     /* ========================= */
 
+    recursos: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 11,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        marginBottom: 14,
+    },
+    recursosTexto: {
+        color: "#0875C9",
+        fontFamily: "Poppins",
+        fontSize: 12,
+    },
     pergunta: {
         fontFamily: "Poppins",
         fontSize: 24,
