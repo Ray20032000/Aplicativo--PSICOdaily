@@ -8,10 +8,12 @@ import {
     Dimensions,
     TextInput,
 } from "react-native";
+import { useState } from "react";
 
 const { width } = Dimensions.get("window");
 
-export default function EsqueciSenha({ navigation }) {
+export default function EsqueciSenha({ navigation, route }) {
+    const [email, setEmail] = useState(route?.params?.email || "");
     return (
         <View style={styles.container}>
 
@@ -45,6 +47,8 @@ export default function EsqueciSenha({ navigation }) {
 
                         <TextInput
                             style={styles.input}
+                            value={email}
+                            onChangeText={setEmail}
                             inputMode="email"
                             keyboardType="email-address"
                             autoCapitalize="none"
@@ -54,7 +58,7 @@ export default function EsqueciSenha({ navigation }) {
 
                     <Pressable
                         style={styles.botaoEnviar}
-                        onPress={() => navigation.navigate("AlterarSenha")}
+                        onPress={() => navigation.navigate("AlterarSenha", { email: email.trim() })}
                     >
                         <Text style={styles.textoEnviar}>
                             Enviar Código

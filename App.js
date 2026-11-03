@@ -20,11 +20,14 @@ import AlterarSenha from "./screens/AlterarSenha";
 import AtivarConta from "./screens/AtivarConta";
 
 
-import Profissionais from "./screens/Profissionais";
+import Marketplace from "./screens/Marketplace";
+import DescricaoPsicologo from "./screens/DescricaoPsicologo";
+import Pagamento from "./screens/Pagamento";
 import Sessoes from "./screens/Sessoes";
 import Perfil from "./screens/Perfil";
 import Dashboard from "./screens/Dashboard";
 import Diario from "./screens/Diario";
+import Notas from "./screens/Notas";
 
 
 const Stack = createNativeStackNavigator();
@@ -111,7 +114,7 @@ function AppTabs() {
 
             <Tab.Screen
                 name="Profissionais"
-                component={Profissionais}
+                component={Marketplace}
             />
 
             <Tab.Screen
@@ -131,7 +134,7 @@ function AppTabs() {
 
             <Tab.Screen
                 name="Diário"
-                component={Diario}
+                component={Notas}
             />
 
         </Tab.Navigator>
@@ -196,6 +199,21 @@ export default function App() {
                 <Stack.Screen
                     name="AppTabs"
                     component={AppTabs}
+                />
+
+                <Stack.Screen
+                    name="DescricaoPsicologo"
+                    component={DescricaoPsicologo}
+                />
+
+                <Stack.Screen
+                    name="Pagamento"
+                    component={Pagamento}
+                />
+
+                <Stack.Screen
+                    name="Diario"
+                    component={Diario}
                 />
 
             </Stack.Navigator>

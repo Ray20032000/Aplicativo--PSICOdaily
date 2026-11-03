@@ -13,9 +13,9 @@ import { useState } from "react";
 
 const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
 
-export default function AlterarSenha({ navigation }) {
+export default function AlterarSenha({ navigation, route }) {
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState(route?.params?.email || "");
     const [codigo, setCodigo] = useState("");
     const [novaSenha, setNovaSenha] = useState("");
     const [confirmarSenha, setConfirmarSenha] = useState("");

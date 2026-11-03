@@ -531,3 +531,141 @@
 {"_e":"metro:client_log","_t":1791218692976,"level":"log","data":["Dados recebidos:","{\"message\": \"Usuario logado com sucesso\", \"usuario\": {\"email\": \"paulo.cavallini08@gmail.com\", \"id_usuario\": 22, \"nome\": \"Doutor Batman\", \"tipo_usuario\": \"PSICOLOGO\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoyMiwidXN1YXJpb19yb2xlIjoiUFNJQ09MT0dPIn0.P9mbyo-3A0ZAr6ByK_aj0Y64KThUz0PmvhcOZejTYAA\"}}"]}
 {"_e":"metro:client_log","_t":1791218693004,"level":"log","data":["Login realizado com sucesso."]}
 {"_e":"metro:client_log","_t":1791218693007,"level":"log","data":["Usuário:","{\"email\": \"paulo.cavallini08@gmail.com\", \"id_usuario\": 22, \"nome\": \"Doutor Batman\", \"tipo_usuario\": \"PSICOLOGO\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjoyMiwidXN1YXJpb19yb2xlIjoiUFNJQ09MT0dPIn0.P9mbyo-3A0ZAr6ByK_aj0Y64KThUz0PmvhcOZejTYAA\"}"]}
+{"_e":"root:init","_t":1793694869151,"format":"v0-jsonl","version":"57.0.27"}
+{"_e":"env:mode","_t":1793694869152,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1793694869154,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1793694870178,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1793694871506,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1793694872975,"plugins":[]}
+{"_e":"metro:instantiate","_t":1793694881315,"atlas":false,"workers":8,"host":"::","port":8081}
+{"_e":"metro:client_log","_t":1793694921194,"level":"error","data":["Project is incompatible with this version of Expo Go\n\n• The installed version of Expo Go is for SDK 58.\n• The project you opened uses SDK 57.\n\nHow to fix this error:\nEither upgrade this project to SDK 58 or install an older version of Expo Go that is compatible with your project.\n\n<a href='https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/'>Learn how to upgrade to SDK 58.</a>\n\n<a href='https://expo.dev/go?sdkVersion=57&platform=android&device=true'>Learn how to install Expo Go for SDK 57</a>."]}
+{"_e":"metro:client_log","_t":1793695028692,"level":"error","data":["Project is incompatible with this version of Expo Go\n\n• The installed version of Expo Go is for SDK 58.\n• The project you opened uses SDK 57.\n\nHow to fix this error:\nEither upgrade this project to SDK 58 or install an older version of Expo Go that is compatible with your project.\n\n<a href='https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/'>Learn how to upgrade to SDK 58.</a>\n\n<a href='https://expo.dev/go?sdkVersion=57&platform=android&device=true'>Learn how to install Expo Go for SDK 57</a>."]}
+{"_e":"metro:bundling:started","_t":1793695287539,"id":"3","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1793695287540,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793695287544,"id":"3","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793695289266,"id":"3","progress":0.010000000000000002,"total":1,"current":1}
+{"_e":"metro:bundling:progress","_t":1793695289366,"id":"3","progress":0.010000000000000002,"total":25,"current":2}
+{"_e":"metro:bundling:progress","_t":1793695289493,"id":"3","progress":0.02366863905325444,"total":26,"current":4}
+{"_e":"metro:bundling:progress","_t":1793695289601,"id":"3","progress":0.02366863905325444,"total":29,"current":4}
+{"_e":"metro:bundling:progress","_t":1793695289618,"id":"3","progress":0.02972651605231867,"total":29,"current":5}
+{"_e":"metro:bundling:progress","_t":1793695289721,"id":"3","progress":0.0478515625,"total":32,"current":7}
+{"_e":"metro:bundling:progress","_t":1793695289841,"id":"3","progress":0.0625,"total":32,"current":8}
+{"_e":"metro:bundling:progress","_t":1793695290275,"id":"3","progress":0.0791015625,"total":32,"current":9}
+{"_e":"metro:bundling:progress","_t":1793695290389,"id":"3","progress":0.0791015625,"total":41,"current":10}
+{"_e":"metro:bundling:progress","_t":1793695290491,"id":"3","progress":0.0791015625,"total":51,"current":14}
+{"_e":"metro:bundling:progress","_t":1793695290595,"id":"3","progress":0.1111111111111111,"total":78,"current":26}
+{"_e":"metro:bundling:progress","_t":1793695290696,"id":"3","progress":0.1111111111111111,"total":102,"current":34}
+{"_e":"metro:bundling:progress","_t":1793695290803,"id":"3","progress":0.18938614540466392,"total":108,"current":47}
+{"_e":"metro:bundling:progress","_t":1793695290940,"id":"3","progress":0.18938614540466392,"total":134,"current":51}
+{"_e":"metro:bundling:progress","_t":1793695291054,"id":"3","progress":0.18938614540466392,"total":243,"current":63}
+{"_e":"metro:bundling:progress","_t":1793695291160,"id":"3","progress":0.18938614540466392,"total":284,"current":80}
+{"_e":"metro:bundling:progress","_t":1793695291261,"id":"3","progress":0.18938614540466392,"total":306,"current":90}
+{"_e":"metro:bundling:progress","_t":1793695291466,"id":"3","progress":0.18938614540466392,"total":306,"current":101}
+{"_e":"metro:bundling:progress","_t":1793695291714,"id":"3","progress":0.18938614540466392,"total":2163,"current":102}
+{"_e":"metro:bundling:progress","_t":1793695291814,"id":"3","progress":0.18938614540466392,"total":2166,"current":113}
+{"_e":"metro:bundling:progress","_t":1793695291915,"id":"3","progress":0.18938614540466392,"total":2173,"current":134}
+{"_e":"metro:bundling:progress","_t":1793695292016,"id":"3","progress":0.18938614540466392,"total":2176,"current":138}
+{"_e":"metro:bundling:progress","_t":1793695292119,"id":"3","progress":0.18938614540466392,"total":2191,"current":151}
+{"_e":"metro:bundling:progress","_t":1793695292234,"id":"3","progress":0.18938614540466392,"total":2205,"current":155}
+{"_e":"metro:bundling:progress","_t":1793695292334,"id":"3","progress":0.18938614540466392,"total":2213,"current":159}
+{"_e":"metro:bundling:progress","_t":1793695292441,"id":"3","progress":0.18938614540466392,"total":2232,"current":174}
+{"_e":"metro:bundling:progress","_t":1793695292542,"id":"3","progress":0.18938614540466392,"total":2270,"current":208}
+{"_e":"metro:bundling:progress","_t":1793695292642,"id":"3","progress":0.18938614540466392,"total":2322,"current":245}
+{"_e":"metro:bundling:progress","_t":1793695292742,"id":"3","progress":0.18938614540466392,"total":2349,"current":272}
+{"_e":"metro:bundling:progress","_t":1793695292843,"id":"3","progress":0.18938614540466392,"total":2398,"current":309}
+{"_e":"metro:bundling:progress","_t":1793695292943,"id":"3","progress":0.18938614540466392,"total":2415,"current":376}
+{"_e":"metro:bundling:progress","_t":1793695293043,"id":"3","progress":0.18938614540466392,"total":2415,"current":425}
+{"_e":"metro:bundling:progress","_t":1793695293144,"id":"3","progress":0.18938614540466392,"total":2415,"current":484}
+{"_e":"metro:bundling:progress","_t":1793695293245,"id":"3","progress":0.18938614540466392,"total":2415,"current":549}
+{"_e":"metro:bundling:progress","_t":1793695293345,"id":"3","progress":0.18938614540466392,"total":2415,"current":607}
+{"_e":"metro:bundling:progress","_t":1793695293445,"id":"3","progress":0.18938614540466392,"total":2415,"current":674}
+{"_e":"metro:bundling:progress","_t":1793695293545,"id":"3","progress":0.18938614540466392,"total":2415,"current":754}
+{"_e":"metro:bundling:progress","_t":1793695293645,"id":"3","progress":0.18938614540466392,"total":2415,"current":836}
+{"_e":"metro:bundling:progress","_t":1793695293745,"id":"3","progress":0.18938614540466392,"total":2415,"current":917}
+{"_e":"metro:bundling:progress","_t":1793695293845,"id":"3","progress":0.18938614540466392,"total":2415,"current":997}
+{"_e":"metro:bundling:progress","_t":1793695293945,"id":"3","progress":0.20110489564445813,"total":2415,"current":1083}
+{"_e":"metro:bundling:progress","_t":1793695294045,"id":"3","progress":0.23151438773366942,"total":2415,"current":1162}
+{"_e":"metro:bundling:progress","_t":1793695294145,"id":"3","progress":0.26067049882334786,"total":2415,"current":1233}
+{"_e":"metro:bundling:progress","_t":1793695294247,"id":"3","progress":0.2920026233555804,"total":2415,"current":1305}
+{"_e":"metro:bundling:progress","_t":1793695294348,"id":"3","progress":0.3199389598309393,"total":2415,"current":1366}
+{"_e":"metro:bundling:progress","_t":1793695294448,"id":"3","progress":0.350130696260861,"total":2415,"current":1429}
+{"_e":"metro:bundling:progress","_t":1793695294548,"id":"3","progress":0.3878478625224507,"total":2415,"current":1504}
+{"_e":"metro:bundling:progress","_t":1793695294648,"id":"3","progress":0.42749396671081796,"total":2415,"current":1579}
+{"_e":"metro:bundling:progress","_t":1793695294748,"id":"3","progress":0.4724783423136111,"total":2415,"current":1660}
+{"_e":"metro:bundling:progress","_t":1793695294848,"id":"3","progress":0.5257000544389149,"total":2415,"current":1751}
+{"_e":"metro:bundling:progress","_t":1793695294948,"id":"3","progress":0.5767191766435623,"total":2415,"current":1834}
+{"_e":"metro:bundling:progress","_t":1793695295048,"id":"3","progress":0.6255074178379606,"total":2415,"current":1910}
+{"_e":"metro:bundling:progress","_t":1793695295148,"id":"3","progress":0.6817357012118017,"total":2415,"current":1994}
+{"_e":"metro:bundling:progress","_t":1793695295248,"id":"3","progress":0.7439508935269129,"total":2415,"current":2083}
+{"_e":"metro:bundling:progress","_t":1793695295348,"id":"3","progress":0.7896327730840289,"total":2415,"current":2146}
+{"_e":"metro:bundling:progress","_t":1793695295451,"id":"3","progress":0.8112509934769129,"total":2447,"current":2204}
+{"_e":"metro:bundling:progress","_t":1793695295551,"id":"3","progress":0.8112509934769129,"total":2500,"current":2238}
+{"_e":"metro:bundling:progress","_t":1793695295655,"id":"3","progress":0.8112509934769129,"total":2550,"current":2286}
+{"_e":"metro:bundling:progress","_t":1793695295755,"id":"3","progress":0.8241888929259226,"total":2561,"current":2325}
+{"_e":"metro:bundling:progress","_t":1793695295855,"id":"3","progress":0.8440256270725097,"total":2571,"current":2362}
+{"_e":"metro:bundling:progress","_t":1793695295955,"id":"3","progress":0.8511919025390831,"total":2584,"current":2384}
+{"_e":"metro:bundling:progress","_t":1793695296056,"id":"3","progress":0.8589090375924888,"total":2622,"current":2430}
+{"_e":"metro:bundling:progress","_t":1793695296158,"id":"3","progress":0.8724324777943637,"total":2638,"current":2464}
+{"_e":"metro:bundling:progress","_t":1793695296257,"id":"3","progress":0.8864400142399431,"total":2650,"current":2495}
+{"_e":"metro:bundling:progress","_t":1793695296357,"id":"3","progress":0.9096901377659772,"total":2661,"current":2538}
+{"_e":"metro:bundling:progress","_t":1793695296457,"id":"3","progress":0.9096901377659772,"total":2700,"current":2573}
+{"_e":"metro:bundling:progress","_t":1793695296557,"id":"3","progress":0.9240379066880686,"total":2711,"current":2606}
+{"_e":"metro:bundling:progress","_t":1793695296657,"id":"3","progress":0.9345857753240314,"total":2736,"current":2645}
+{"_e":"metro:bundling:progress","_t":1793695296757,"id":"3","progress":0.9450008730020159,"total":2761,"current":2684}
+{"_e":"metro:bundling:progress","_t":1793695296859,"id":"3","progress":0.9450008730020159,"total":2876,"current":2716}
+{"_e":"metro:bundling:progress","_t":1793695296960,"id":"3","progress":0.9450008730020159,"total":2899,"current":2738}
+{"_e":"metro:bundling:progress","_t":1793695297060,"id":"3","progress":0.9450008730020159,"total":2923,"current":2772}
+{"_e":"metro:bundling:progress","_t":1793695297160,"id":"3","progress":0.9450008730020159,"total":2939,"current":2792}
+{"_e":"metro:bundling:progress","_t":1793695297264,"id":"3","progress":0.9450008730020159,"total":2940,"current":2815}
+{"_e":"metro:bundling:progress","_t":1793695297364,"id":"3","progress":0.9450008730020159,"total":2951,"current":2849}
+{"_e":"metro:bundling:progress","_t":1793695297464,"id":"3","progress":0.9545514599022329,"total":2958,"current":2890}
+{"_e":"metro:bundling:progress","_t":1793695297564,"id":"3","progress":0.965301289555346,"total":2971,"current":2919}
+{"_e":"metro:bundling:progress","_t":1793695297664,"id":"3","progress":0.9773868301249427,"total":2990,"current":2956}
+{"_e":"metro:bundling:progress","_t":1793695297768,"id":"3","progress":0.9973288826618384,"total":2993,"current":2989}
+{"_e":"metro:bundling:progress","_t":1793695297873,"id":"3","progress":0.9986639948051189,"total":2993,"current":2991}
+{"_e":"metro:bundling:progress","_t":1793695298281,"id":"3","progress":0.999,"total":2993,"current":2992}
+{"_e":"metro:bundling:progress","_t":1793695298383,"id":"3","progress":0.999,"total":2996,"current":2995}
+{"_e":"metro:bundling:progress","_t":1793695298516,"id":"3","progress":0.999,"total":2996,"current":2996}
+{"_e":"metro:bundling:progress","_t":1793695298623,"id":"3","progress":0.999,"total":3007,"current":3007}
+{"_e":"metro:bundling:done","_t":1793695298925,"id":"3","total":3007,"ms":11384.9929}
+{"_e":"metro:client_log","_t":1793695326396,"level":"log","data":["Tentando conectar em:","https://p01--psicodaily-api--zfhqcbxfx5v8.code.run/api/auth/login_mobile"]}
+{"_e":"metro:client_log","_t":1793695327086,"level":"log","data":["Status HTTP:","401"]}
+{"_e":"metro:client_log","_t":1793695327133,"level":"log","data":["Resposta do servidor:","{\"error\":\"Senha incorreta\"}\n"]}
+{"_e":"metro:client_log","_t":1793695327133,"level":"log","data":["Dados recebidos:","{\"error\": \"Senha incorreta\"}"]}
+{"_e":"metro:client_log","_t":1793695338191,"level":"log","data":["Tentando conectar em:","https://p01--psicodaily-api--zfhqcbxfx5v8.code.run/api/auth/login_mobile"]}
+{"_e":"metro:client_log","_t":1793695338641,"level":"log","data":["Status HTTP:","401"]}
+{"_e":"metro:client_log","_t":1793695338686,"level":"log","data":["Resposta do servidor:","{\"error\":\"Senha incorreta\"}\n"]}
+{"_e":"metro:client_log","_t":1793695338686,"level":"log","data":["Dados recebidos:","{\"error\": \"Senha incorreta\"}"]}
+{"_e":"metro:client_log","_t":1793695342971,"level":"log","data":["Tentando conectar em:","https://p01--psicodaily-api--zfhqcbxfx5v8.code.run/api/auth/login_mobile"]}
+{"_e":"metro:client_log","_t":1793695343456,"level":"log","data":["Status HTTP:","200"]}
+{"_e":"metro:client_log","_t":1793695343511,"level":"log","data":["Resposta do servidor:","{\"message\":\"Usuario logado com sucesso\",\"usuario\":{\"email\":\"andrade.rayssa.da.silva@gmail.com\",\"id_usuario\":35,\"nome\":\"Rayssa Andrade da Silva\",\"tipo_usuario\":\"PACIENTE\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTUzNDQsImV4cCI6MTc5MzcyNDE0NH0.vc-pbzsjjMYnf5T-AxxT_hoG9zw0AwvjDi6u721flrA\"}}\n"]}
+{"_e":"metro:client_log","_t":1793695343511,"level":"log","data":["Dados recebidos:","{\"message\": \"Usuario logado com sucesso\", \"usuario\": {\"email\": \"andrade.rayssa.da.silva@gmail.com\", \"id_usuario\": 35, \"nome\": \"Rayssa Andrade da Silva\", \"tipo_usuario\": \"PACIENTE\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTUzNDQsImV4cCI6MTc5MzcyNDE0NH0.vc-pbzsjjMYnf5T-AxxT_hoG9zw0AwvjDi6u721flrA\"}}"]}
+{"_e":"metro:client_log","_t":1793695343558,"level":"log","data":["Login realizado com sucesso."]}
+{"_e":"metro:client_log","_t":1793695343558,"level":"log","data":["Usuário:","{\"email\": \"andrade.rayssa.da.silva@gmail.com\", \"id_usuario\": 35, \"nome\": \"Rayssa Andrade da Silva\", \"tipo_usuario\": \"PACIENTE\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTUzNDQsImV4cCI6MTc5MzcyNDE0NH0.vc-pbzsjjMYnf5T-AxxT_hoG9zw0AwvjDi6u721flrA\"}"]}
+{"_e":"metro:client_log","_t":1793695349226,"level":"warn","data":["SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context"]}
+{"_e":"metro:client_log","_t":1793695808443,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: Acesso negado]"]}
+{"_e":"metro:client_log","_t":1793695816169,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:bundling:failed","_t":1793695849390,"id":null,"message":"Unable to resolve \"./screens/Sessoes\" from \"App.js\"\n  24 | import DescricaoPsicologo from \"./screens/DescricaoPsicologo\";\n  25 | import Pagamento from \"./screens/Pagamento\";\n> 26 | import Sessoes from \"./screens/Sessoes\";\n     |                      ^\n  27 | import Perfil from \"./screens/Perfil\";\n  28 | import Dashboard from \"./screens/Dashboard\";\n  29 | import Diario from \"./screens/Diario\";","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39mApp.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./screens/Sessoes\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index\"\u001b[39m\n","filename":null,"targetModuleName":"./screens/Sessoes","originModulePath":"App.js"}
+{"_e":"metro:client_log","_t":1793695893996,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:bundling:failed","_t":1793696080627,"id":null,"message":"Unable to resolve \"./screens/Diario\" from \"App.js\"\n  27 | import Perfil from \"./screens/Perfil\";\n  28 | import Dashboard from \"./screens/Dashboard\";\n> 29 | import Diario from \"./screens/Diario\";\n     |                     ^\n  30 |\n  31 |\n  32 | const Stack = createNativeStackNavigator();","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39mApp.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./screens/Diario\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index\"\u001b[39m\n","filename":null,"targetModuleName":"./screens/Diario","originModulePath":"App.js"}
+{"_e":"metro:bundling:failed","_t":1793696213239,"id":null,"message":"Unable to resolve \"./screens/Diario\" from \"App.js\"\n  27 | import Perfil from \"./screens/Perfil\";\n  28 | import Dashboard from \"./screens/Dashboard\";\n> 29 | import Diario from \"./screens/Diario\";\n     |                     ^\n  30 | import Notas from \"./screens/Notas\";\n  31 |\n  32 |","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39mApp.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./screens/Diario\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index\"\u001b[39m\n","filename":null,"targetModuleName":"./screens/Diario","originModulePath":"App.js"}
+{"_e":"metro:client_log","_t":1793696253663,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:client_log","_t":1793696485248,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:bundling:failed","_t":1793696601698,"id":null,"message":"Unable to resolve \"./screens/Pagamento\" from \"App.js\"\n  23 | import Marketplace from \"./screens/Marketplace\";\n  24 | import DescricaoPsicologo from \"./screens/DescricaoPsicologo\";\n> 25 | import Pagamento from \"./screens/Pagamento\";\n     |                        ^\n  26 | import Sessoes from \"./screens/Sessoes\";\n  27 | import Perfil from \"./screens/Perfil\";\n  28 | import Dashboard from \"./screens/Dashboard\";","importStack":"\u001b[1mImport stack:\u001b[22m\n\n\u001b[90m \u001b[39mApp.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./screens/Pagamento\"\u001b[39m\n\n\u001b[90m \u001b[39mindex.js\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./App\"\u001b[39m\n\n\u001b[90m \u001b[39m\n\u001b[90m |\u001b[39m \u001b[36mimport\u001b[39m \u001b[32m\"./index\"\u001b[39m\n","filename":null,"targetModuleName":"./screens/Pagamento","originModulePath":"App.js"}
+{"_e":"metro:client_log","_t":1793696648382,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:client_log","_t":1793696690687,"level":"warn","data":["Não foi possível carregar o perfil:","[Error: A API retornou dados de perfil inválidos.]"]}
+{"_e":"metro:bundling:started","_t":1793697198647,"id":"s","platform":"android","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1793697198647,"id":"s","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1793697198648,"id":"s","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1793697198758,"id":"s","total":1,"ms":111.3122}
+{"_e":"metro:client_log","_t":1793697220149,"level":"log","data":["Tentando conectar em:","https://p01--psicodaily-api--zfhqcbxfx5v8.code.run/api/auth/login_mobile"]}
+{"_e":"metro:client_log","_t":1793697220909,"level":"log","data":["Status HTTP:","401"]}
+{"_e":"metro:client_log","_t":1793697220980,"level":"log","data":["Resposta do servidor:","{\"error\":\"Senha incorreta\"}\n"]}
+{"_e":"metro:client_log","_t":1793697220980,"level":"log","data":["Dados recebidos:","{\"error\": \"Senha incorreta\"}"]}
+{"_e":"metro:client_log","_t":1793697225500,"level":"log","data":["Tentando conectar em:","https://p01--psicodaily-api--zfhqcbxfx5v8.code.run/api/auth/login_mobile"]}
+{"_e":"metro:client_log","_t":1793697225922,"level":"log","data":["Status HTTP:","200"]}
+{"_e":"metro:client_log","_t":1793697225965,"level":"log","data":["Resposta do servidor:","{\"message\":\"Usuario logado com sucesso\",\"usuario\":{\"email\":\"andrade.rayssa.da.silva@gmail.com\",\"id_usuario\":35,\"nome\":\"Rayssa Andrade da Silva\",\"tipo_usuario\":\"PACIENTE\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTcyMjcsImV4cCI6MTc5MzcyNjAyN30.mdZpOTBUwwTEij9p3qLLc6LLMn3eFq8pLGz7ICvB9gU\"}}\n"]}
+{"_e":"metro:client_log","_t":1793697225965,"level":"log","data":["Dados recebidos:","{\"message\": \"Usuario logado com sucesso\", \"usuario\": {\"email\": \"andrade.rayssa.da.silva@gmail.com\", \"id_usuario\": 35, \"nome\": \"Rayssa Andrade da Silva\", \"tipo_usuario\": \"PACIENTE\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTcyMjcsImV4cCI6MTc5MzcyNjAyN30.mdZpOTBUwwTEij9p3qLLc6LLMn3eFq8pLGz7ICvB9gU\"}}"]}
+{"_e":"metro:client_log","_t":1793697226011,"level":"log","data":["Login realizado com sucesso."]}
+{"_e":"metro:client_log","_t":1793697226011,"level":"log","data":["Usuário:","{\"email\": \"andrade.rayssa.da.silva@gmail.com\", \"id_usuario\": 35, \"nome\": \"Rayssa Andrade da Silva\", \"tipo_usuario\": \"PACIENTE\", \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c3VhcmlvIjozNSwidXN1YXJpb19yb2xlIjoiUEFDSUVOVEUiLCJpYXQiOjE3OTM2OTcyMjcsImV4cCI6MTc5MzcyNjAyN30.mdZpOTBUwwTEij9p3qLLc6LLMn3eFq8pLGz7ICvB9gU\"}"]}
+{"_e":"metro:client_log","_t":1793697227183,"level":"warn","data":["Não foi possível carregar registros do diário para o gráfico:","[Error: A API retornou registros do diário inválidos.]"]}
