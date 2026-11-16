@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView, View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { CalendarDays, BookOpen, Wallet, Users, MessageCircle, FileText, Newspaper, Settings, ShieldCheck, HeartHandshake, ClipboardList, BadgeCheck } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const grupos = {
   PACIENTE: [
     ["Diário de humor", "Acompanhe seus sentimentos e sua evolução", "Diario", BookOpen],
@@ -34,6 +34,13 @@ const grupos = {
 };
 grupos.PSIQUIATRA = grupos.PSICOLOGO;
 
+async function lerResposta(response) {
+  const text = await response.text();
+  if (!text.trim()) return {};
+  try { return JSON.parse(text); }
+  catch { throw new Error("O servidor retornou uma resposta inválida. Tente novamente."); }
+}
+
 export default function Portal() {
   const navigation = useNavigation();
   const [nome, setNome] = useState("Olá");
@@ -50,7 +57,7 @@ export default function Portal() {
         if (ativo) { setNome(usuario.nome || "Olá"); setTipo(papel); }
         const endpoint = papel === "ADMIN" ? "/api/admin/metricas" : "/api/dashboard/";
         const response = await fetch(`${API}${endpoint}`, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
-        const data = await response.json();
+        const data = await lerResposta(response);
         if (response.ok && ativo) setResumo(data);
       } catch { /* O menu continua disponível quando a rede estiver fora. */ }
       finally { if (ativo) setCarregando(false); }

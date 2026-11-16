@@ -10,9 +10,67 @@ const campos = [["Nome completo", "nome"], ["E-mail", "email"], ["Telefone", "te
 export default function CadastroProfissional() {
   const navigation = useNavigation(); const [dados, setDados] = useState({ nome: "", email: "", telefone: "", cpf: "", crp_crm: "", senha: "", confirmarSenha: "", especialidade: "Psicologia", descricao: "", valor: "" }); const [abordagem, setAbordagem] = useState("TCC"); const [modalidade, setModalidade] = useState("ONLINE"); const [dias, setDias] = useState([]); const [loading, setLoading] = useState(false);
   const change = (key, value) => setDados((d) => ({ ...d, [key]: value }));
-  const submit = async () => { if (Object.values(dados).some((v) => !String(v).trim())) { Alert.alert("Campos obrigatórios", "Preencha todos os campos para continuar."); return; } if (dados.senha !== dados.confirmarSenha) { Alert.alert("Confira a senha", "As senhas precisam ser iguais."); return; } const form = new FormData(); Object.entries(dados).forEach(([key, value]) => form.append(key, value)); form.append("abordagem", abordagem); form.append("modalidade", modalidade); dias.forEach((dia) => form.append("dias[]", dia)); setLoading(true); try { const response = await fetch(`${API}/api/profissionais/`, { method: "POST", body: form }); const result = await response.json().catch(() => ({})); if (!response.ok) throw new Error(result.error || "Não foi possível realizar o cadastro profissional."); Alert.alert("Cadastro recebido", result.message || "Confira seu e-mail para ativar a conta.", [{ text: "Continuar", onPress: () => navigation.navigate("AtivarConta", { email: dados.email }) }]); } catch (e) { Alert.alert("Cadastro não realizado", e.message); } finally { setLoading(false); } };
+  const formatarTelefone = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (!digits) return "";
+    if (digits.length <= 2) return digits.length === 2 ? `(${digits})` : `(${digits}`;
+    const ddd = digits.slice(0, 2);
+    const local = digits.slice(2);
+    const prefixLength = local.startsWith("9") || digits.length === 11 ? 5 : 4;
+    const prefix = local.slice(0, prefixLength);
+    const suffix = local.slice(prefixLength, prefixLength + 4);
+    return `(${ddd}) ${prefix}${suffix ? `-${suffix}` : ""}`;
+  };
+  const formatarCpf = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    return digits
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3}\.\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3}\.\d{3}\.\d{3})(\d)/, "$1-$2");
+  };
+  const submit = async () => {
+    if (Object.values(dados).some((v) => !String(v).trim())) {
+      Alert.alert("Campos obrigatórios", "Preencha todos os campos para continuar.");
+      return;
+    }
+    const telefone = dados.telefone.replace(/\D/g, "");
+    const cpf = dados.cpf.replace(/\D/g, "");
+    if (telefone.length !== 11) {
+      Alert.alert("Telefone inválido", "Informe o telefone com DDD e 9 digitos.");
+      return;
+    }
+    if (cpf.length !== 11) {
+      Alert.alert("CPF invalido", "Informe os 11 digitos do CPF.");
+      return;
+    }
+    if (dados.senha !== dados.confirmarSenha) {
+      Alert.alert("Confira a senha", "As senhas precisam ser iguais.");
+      return;
+    }
+    const form = new FormData();
+    Object.entries(dados).forEach(([key, value]) => {
+      const normalized = key === "telefone" ? telefone : key === "cpf" ? cpf : value;
+      form.append(key, normalized);
+    });
+    form.append("abordagem", abordagem);
+    form.append("modalidade", modalidade);
+    dias.forEach((dia) => form.append("dias[]", dia));
+    setLoading(true);
+    try {
+      const response = await fetch(`${API}/api/profissionais/`, { method: "POST", body: form });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Não foi possível realizar o cadastro profissional.");
+      Alert.alert("Cadastro recebido", result.message || "Confira seu e-mail para ativar a conta.", [
+        { text: "Continuar", onPress: () => navigation.navigate("AtivarConta", { email: dados.email }) },
+      ]);
+    } catch (e) {
+      Alert.alert("Cadastro não realizado", e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return <SafeAreaView style={styles.page}><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled"><Pressable onPress={() => navigation.goBack()}><Text style={styles.back}>‹  Voltar</Text></Pressable><Text style={styles.eyebrow}>PSICODAILY PARA PROFISSIONAIS</Text><Text style={styles.title}>Crie seu perfil profissional</Text><Text style={styles.sub}>Cadastre-se para oferecer atendimentos pela plataforma.</Text>
-    <View style={styles.card}><Text style={styles.section}>Dados pessoais e profissionais</Text>{campos.map(([label, key]) => <View key={key} style={styles.field}><Text style={styles.label}>{label}</Text><TextInput value={dados[key]} onChangeText={(v) => change(key, v)} style={styles.input} placeholder={label} placeholderTextColor="#8996A3" autoCapitalize={key === "email" ? "none" : "words"} keyboardType={key === "email" ? "email-address" : key === "telefone" || key === "cpf" ? "phone-pad" : "default"} secureTextEntry={key === "senha" || key === "confirmarSenha"} /></View>)}
+    <View style={styles.card}><Text style={styles.section}>Dados pessoais e profissionais</Text>{campos.map(([label, key]) => <View key={key} style={styles.field}><Text style={styles.label}>{label}</Text><TextInput value={dados[key]} onChangeText={(v) => change(key, key === "telefone" ? formatarTelefone(v) : key === "cpf" ? formatarCpf(v) : v)} maxLength={key === "telefone" ? 15 : key === "cpf" ? 14 : undefined} style={styles.input} placeholder={label} placeholderTextColor="#8996A3" autoCapitalize={key === "email" ? "none" : "words"} keyboardType={key === "email" ? "email-address" : key === "telefone" || key === "cpf" ? "phone-pad" : "default"} secureTextEntry={key === "senha" || key === "confirmarSenha"} /></View>)}
     <Text style={styles.label}>Profissão</Text><View style={styles.choices}>{[["Psicologia", "Psicologia"], ["Psiquiatria", "Psiquiatria"]].map(([v, label]) => <Pressable key={v} onPress={() => change("especialidade", v)} style={[styles.choice, dados.especialidade === v && styles.choiceActive]}><Text style={[styles.choiceText, dados.especialidade === v && styles.activeText]}>{label}</Text></Pressable>)}</View>
     <Text style={styles.label}>Abordagem</Text><View style={styles.choices}>{abordagens.map((v) => <Pressable key={v} onPress={() => setAbordagem(v)} style={[styles.choice, abordagem === v && styles.choiceActive]}><Text style={[styles.choiceText, abordagem === v && styles.activeText]}>{v}</Text></Pressable>)}</View>
     <Text style={styles.label}>Modalidade de atendimento</Text><View style={styles.choices}>{modalidades.map(([v, label]) => <Pressable key={v} onPress={() => setModalidade(v)} style={[styles.choice, modalidade === v && styles.choiceActive]}><Text style={[styles.choiceText, modalidade === v && styles.activeText]}>{label}</Text></Pressable>)}</View>

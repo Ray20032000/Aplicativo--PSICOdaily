@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ArrowLeft, RefreshCw } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const requests = {
   Agenda: ["/api/consultas/", "consultas"],
   Prontuario: ["/api/consultas/", "consultas"],
@@ -17,7 +17,13 @@ const requests = {
   Administracao: ["/api/usuarios/", "usuarios"],
 };
 const adminTabs = [["Usuários", "/api/usuarios/"], ["Métricas", "/api/admin/metricas"], ["Reembolsos", "/api/admin/reembolsos"], ["Repasses", "/api/admin/repasses"], ["Auditoria", "/api/admin/auditoria"]];
-function listFrom(value) { if (Array.isArray(value)) return value; if (!value || typeof value !== "object") return []; const list = Object.values(value).find(Array.isArray); return list || [value]; }
+async function lerResposta(response) {
+  const text = await response.text();
+  if (!text.trim()) return {};
+  try { return JSON.parse(text); }
+  catch { throw new Error("O servidor retornou uma resposta inválida. Tente novamente."); }
+}
+function listFrom(value) { if (Array.isArray(value)) return value; if (!value || typeof value !== "object") return []; const list = Object.values(value).find(Array.isArray); return list || (Object.keys(value).length ? [value] : []); }
 function labelFrom(item) { if (typeof item !== "object" || item === null) return String(item); return item.nome || item.paciente_nome || item.profissional_nome || item.titulo || item.email || item.status || item.acao || Object.entries(item).slice(0, 3).map(([k,v]) => `${k.replaceAll("_", " ")}: ${typeof v === "object" ? "" : String(v)}`).join(" · "); }
 
 export default function Modulo() {
@@ -29,7 +35,7 @@ export default function Modulo() {
     setLoading(true); setError("");
     try { const token = await AsyncStorage.getItem("@psicodaily_token"); const path = pathOverride || requests[module]?.[0] || "/api/dashboard/";
       const response = await fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
-      const payload = await response.json(); if (!response.ok) throw new Error(payload.error || payload.message || "Não foi possível carregar esta área."); setData(payload);
+      const payload = await lerResposta(response); if (!response.ok) throw new Error(payload.error || payload.message || "Não foi possível carregar esta área."); setData(payload);
     } catch (e) { setError(e.message || "Não foi possível conectar à plataforma."); setData(null); } finally { setLoading(false); }
   }, [module]);
   useFocusEffect(useCallback(() => { load(module === "Administracao" ? adminPath : undefined); }, [load, module, adminPath]));
@@ -47,7 +53,7 @@ export default function Modulo() {
           const token = await AsyncStorage.getItem("@psicodaily_token");
           const endpoint = `/api/admin/${reembolso ? "reembolsos" : "repasses"}/${id}/pagar`;
           const response = await fetch(`${API}${endpoint}`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ manual: true }) });
-          const payload = await response.json();
+          const payload = await lerResposta(response);
           if (!response.ok) throw new Error(payload.error || "Não foi possível atualizar o pagamento.");
           await load(adminPath);
         } catch (e) { Alert.alert("Ação não concluída", e.message); }
@@ -59,7 +65,7 @@ export default function Modulo() {
     { text: "Cancelar", style: "cancel" },
     { text: "Gerar", onPress: async () => {
       setBusy(true);
-      try { const token = await AsyncStorage.getItem("@psicodaily_token"); const response = await fetch(`${API}/api/admin/repasses`, { method: "POST", headers: { Authorization: `Bearer ${token}` } }); const payload = await response.json(); if (!response.ok) throw new Error(payload.error || "Não foi possível gerar os repasses."); await load(adminPath); }
+      try { const token = await AsyncStorage.getItem("@psicodaily_token"); const response = await fetch(`${API}/api/admin/repasses`, { method: "POST", headers: { Authorization: `Bearer ${token}` } }); const payload = await lerResposta(response); if (!response.ok) throw new Error(payload.error || "Não foi possível gerar os repasses."); await load(adminPath); }
       catch (e) { Alert.alert("Repasses", e.message); }
       finally { setBusy(false); }
     } },

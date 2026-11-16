@@ -6,9 +6,37 @@ import { ArrowDownLeft, ArrowUpRight, RefreshCw, Wallet } from "lucide-react-nat
 
 const API = "https://api.psicodaily.tech";
 const money = (cents) => (Number(cents || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+async function lerResposta(response) {
+  const text = await response.text();
+  if (!text.trim()) return {};
+  try { return JSON.parse(text); }
+  catch {
+    if (!response.ok) return { error: text.trim() };
+    throw new Error("O servidor retornou uma resposta invalida. Tente novamente.");
+  }
+}
 export default function Carteira() {
   const [data, setData] = useState(null); const [days, setDays] = useState(30); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
-  const load = useCallback(async (period = days) => { setLoading(true); try { const token = await AsyncStorage.getItem("@psicodaily_token"); const response = await fetch(`${API}/api/pagamentos/ganhos?dias=${period}`, { headers: { Authorization: `Bearer ${token}` } }); const payload = await response.json(); if (!response.ok) throw new Error(payload.error || "Não foi possível carregar sua carteira."); setData(payload); setError(""); } catch (e) { setError(e.message); } finally { setLoading(false); } }, [days]);
+  const load = useCallback(async (period = days) => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = await AsyncStorage.getItem("@psicodaily_token");
+      if (!token) throw new Error("Sua sessao expirou. Entre novamente para acessar a carteira.");
+      const query = period === 30 ? "" : `?dias=${period}`;
+      const response = await fetch(`${API}/api/pagamentos/ganhos${query}`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      });
+      const payload = await lerResposta(response);
+      if (!response.ok) throw new Error(payload.error || payload.message || `Nao foi possivel carregar a carteira (HTTP ${response.status}).`);
+      setData(payload);
+    } catch (e) {
+      setError(e.message || "Nao foi possivel conectar a plataforma.");
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [days]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
   return <SafeAreaView style={styles.page}><View style={styles.header}><View><Text style={styles.eyebrow}>ÁREA PROFISSIONAL</Text><Text style={styles.title}>Carteira</Text></View><Pressable onPress={() => load()}><RefreshCw color="#0875C9" size={18} /></Pressable></View>
     {loading ? <ActivityIndicator color="#0875C9" style={{ marginTop: 24 }} /> : error ? <Pressable onPress={() => load()}><Text style={styles.error}>{error} · Toque para tentar novamente</Text></Pressable> : <ScrollView contentContainerStyle={styles.content}>

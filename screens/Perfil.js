@@ -1,4 +1,7 @@
-﻿import { useCallback, useState } from "react";
+﻿import * as ImagePicker from "expo-image-picker";
+import { fetch as expoFetch } from "expo/fetch";
+import { File } from "expo-file-system";
+import { useCallback, useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -35,6 +38,58 @@ export default function Perfil() {
     const [editando, setEditando] = useState(false);
     const [rascunho, setRascunho] = useState({});
     const [salvando, setSalvando] = useState(false);
+    const [fotoSelecionada, setFotoSelecionada] = useState(null);
+    const [salvandoFoto, setSalvandoFoto] = useState(false);
+
+    const escolherFoto = async () => {
+        try {
+            const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (!permissao.granted) {
+                Alert.alert("Permissão necessária", "Permita o acesso às fotos para escolher uma nova imagem de perfil.");
+                return;
+            }
+
+            const resultado = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ["images"],
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+            });
+            if (!resultado.canceled) setFotoSelecionada(resultado.assets[0].uri);
+        } catch (error) {
+            Alert.alert("Erro", error.message || "Não foi possível selecionar a foto.");
+        }
+    };
+
+    const salvarFoto = async () => {
+        if (!fotoSelecionada) return;
+        try {
+            setSalvandoFoto(true);
+            const token = await AsyncStorage.getItem("@psicodaily_token");
+            const formData = new FormData();
+            formData.append("imagem", new File(fotoSelecionada));
+            const response = await expoFetch(`${API_URL}/api/usuarios/me`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData,
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(payload.error || payload.message || "Não foi possível atualizar a foto de perfil.");
+
+            const registro = extrairUsuarios(payload)[0] || {};
+            const fotoAtualizada = registro.foto_perfil || registro.foto || registro.imagem_perfil || registro.imagem || registro.foto_url || fotoSelecionada;
+            const atualizado = { ...usuario, ...registro, foto_perfil: fotoAtualizada };
+            setUsuario(atualizado);
+            setRascunho((atual) => ({ ...atual, ...atualizado }));
+            await AsyncStorage.setItem("@psicodaily_usuario", JSON.stringify(atualizado));
+            setFotoSelecionada(null);
+            Alert.alert("Foto atualizada", "Sua foto de perfil foi salva.");
+        } catch (error) {
+            Alert.alert("Não foi possível salvar a foto", error.message);
+        } finally {
+            setSalvandoFoto(false);
+        }
+    };
 
     const salvarPerfil = async () => {
         try {
@@ -67,7 +122,7 @@ export default function Perfil() {
             "@psicodaily_token", "@psicodaily_usuario", "@psicodaily_id_usuario",
             "@psicodaily_nome", "@psicodaily_email", "@psicodaily_tipo_usuario",
         ]);
-        navigation.getParent()?.getParent()?.reset({ index: 0, routes: [{ name: "Login" }] });
+        navigation.getParent()?.reset({ index: 0, routes: [{ name: "TelaInicial" }] });
     };
 
     useFocusEffect(
@@ -141,7 +196,7 @@ export default function Perfil() {
     );
 
     const imagem = usuario.foto_perfil || usuario.foto || usuario.imagem_perfil || usuario.imagem || usuario.foto_url;
-    const foto = typeof imagem === "string" ? imagem : imagem?.uri;
+    const foto = fotoSelecionada || (typeof imagem === "string" ? imagem : imagem?.uri);
     const inicial = (usuario.nome || "U").trim().charAt(0).toUpperCase();
     const informacoes = [
         ["E-mail", usuario.email],
@@ -172,6 +227,25 @@ export default function Perfil() {
                             </View>
                         )}
                     </View>
+                    <Pressable
+                        accessibilityRole="button"
+                        onPress={escolherFoto}
+                        disabled={salvandoFoto}
+                        style={({ pressed }) => [styles.botaoFoto, pressed && styles.pressionado]}
+                    >
+                        <Text style={styles.textoBotaoFoto}>Escolher foto</Text>
+                    </Pressable>
+                    {fotoSelecionada ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={salvarFoto}
+                            disabled={salvandoFoto}
+                            style={({ pressed }) => [styles.botaoSalvarFoto, pressed && styles.pressionado, salvandoFoto && { opacity: 0.65 }]}
+                        >
+                            {salvandoFoto ? <ActivityIndicator color="#FFFFFF" size="small" /> : null}
+                            <Text style={styles.textoBotaoSalvarFoto}>{salvandoFoto ? "Salvando foto..." : "Salvar nova foto"}</Text>
+                        </Pressable>
+                    ) : null}
 
                     <Text style={styles.titulo}>Meu perfil</Text>
                     <Text style={styles.nome}>{usuario.nome || "Usuário"}</Text>
@@ -274,6 +348,34 @@ const styles = StyleSheet.create({
     foto: {
         width: "100%",
         height: "100%",
+    },
+    botaoFoto: {
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 10,
+        backgroundColor: "#EEF5FA",
+        marginBottom: 12,
+    },
+    textoBotaoFoto: {
+        color: "#0875C9",
+        fontFamily: "Poppins",
+        fontSize: 13,
+    },
+    botaoSalvarFoto: {
+        minHeight: 44,
+        width: "100%",
+        marginBottom: 8,
+        borderRadius: 11,
+        backgroundColor: "#0875C9",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+    },
+    textoBotaoSalvarFoto: {
+        color: "#FFFFFF",
+        fontFamily: "Poppins",
+        fontSize: 13,
     },
     fotoFallback: {
         flex: 1,
