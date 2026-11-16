@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Image, Linking, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, RefreshCw } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const real = (value) => Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 function qrUri(value) { if (!value) return null; if (String(value).startsWith("data:image/")) return value; if (/^https?:\/\//i.test(value)) return value; return `data:image/png;base64,${value}`; }
 export default function Pagamento() {

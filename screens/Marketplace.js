@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { Search, UserRound } from "lucide-react-native";
 
-const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API_URL = "https://api.psicodaily.tech";
 
 function extrairProfissionais(resposta) {
     if (Array.isArray(resposta)) return resposta;

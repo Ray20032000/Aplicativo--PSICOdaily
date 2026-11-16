@@ -1,11 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://10.92.11.22:5000";
+const API_URL = "https://api.psicodaily.tech/api/";
 
 export async function apiFetch(endpoint, options = {}) {
-    const token = await AsyncStorage.getItem(
-        "@psicodaily_token"
-    );
+    const token = await AsyncStorage.getItem("@psicodaily_token");
 
     const headers = {
         ...(options.headers || {}),
@@ -15,13 +13,10 @@ export async function apiFetch(endpoint, options = {}) {
         headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(
-        `${API_URL}${endpoint}`,
-        {
-            ...options,
-            headers,
-        }
-    );
+    const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+    });
 
     const texto = await response.text();
 

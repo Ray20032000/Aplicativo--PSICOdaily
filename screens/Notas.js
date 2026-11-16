@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Plus, RefreshCw } from "lucide-react-native";
 
-const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API_URL = "https://api.psicodaily.tech";
 
 function extrairRegistros(dados) {
     if (Array.isArray(dados)) return dados;

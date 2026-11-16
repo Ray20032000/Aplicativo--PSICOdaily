@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, FlatList, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ArrowLeft, Heart, RefreshCw } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 function extrair(data) { if (Array.isArray(data)) return data; if (Array.isArray(data?.artigos)) return data.artigos; if (Array.isArray(data?.destaques)) return data.destaques; return []; }
 export default function Artigos() {
   const [token, setToken] = useState(""); const [artigos, setArtigos] = useState([]); const [selecionado, setSelecionado] = useState(null); const [carregando, setCarregando] = useState(true); const [erro, setErro] = useState("");

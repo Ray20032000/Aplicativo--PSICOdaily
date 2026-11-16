@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const perguntas = [
   ["motivos", "O que trouxe você até aqui?", "Escolha até três motivos", true],
   ["abordagem", "Você tem preferência por alguma abordagem?", "Se não souber, pode deixar em aberto", false],

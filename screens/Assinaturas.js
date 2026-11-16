@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BadgeCheck, RefreshCw, Sparkles } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const money = (cents) => (Number(cents || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export default function Assinaturas() {
   const [token, setToken] = useState(""); const [plans, setPlans] = useState([]); const [subscription, setSubscription] = useState(null); const [selected, setSelected] = useState(null); const [charge, setCharge] = useState(null); const [loading, setLoading] = useState(true); const [busy, setBusy] = useState(false); const [error, setError] = useState("");

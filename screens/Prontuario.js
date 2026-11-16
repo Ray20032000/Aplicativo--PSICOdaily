@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { ArrowLeft, CalendarDays, Clock3, Activity, RefreshCw, Send } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const moodNames = { PESSIMO: "Muito mal", RUIM: "Mal", NEUTRO: "Neutro", BOM: "Bem", EXCELENTE: "Muito bem" };
 export default function Prontuario() {
   const [token, setToken] = useState(""); const [patients, setPatients] = useState([]); const [patient, setPatient] = useState(null); const [report, setReport] = useState(null); const [period, setPeriod] = useState(30); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [referralOpen, setReferralOpen] = useState(false); const [reason, setReason] = useState(""); const [cid, setCid] = useState(""); const [sending, setSending] = useState(false);

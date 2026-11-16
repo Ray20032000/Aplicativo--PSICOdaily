@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { Check, Moon, Salad, Dumbbell, UsersRound, NotebookPen } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const moods = [["PESSIMO", "Muito mal", "😞"], ["RUIM", "Mal", "🙁"], ["NEUTRO", "Neutro", "😐"], ["BOM", "Bem", "🙂"], ["EXCELENTE", "Muito bem", "😄"]];
 const qualities = [["RUIM", "Ruim"], ["REGULAR", "Regular"], ["BOA", "Boa"], ["EXCELENTE", "Excelente"]];
 const diets = [["POUCA", "Pouca"], ["DESREGULADA", "Desregulada"], ["ADEQUADA", "Adequada"], ["EXCESSIVA", "Excessiva"]];

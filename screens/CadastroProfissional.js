@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const diasSemana = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 const abordagens = ["TCC", "Psicanálise", "Humanista", "Gestalt", "Comportamental"];
 const modalidades = [["ONLINE", "Online"], ["PRESENCIAL", "Presencial"], ["AMBAS", "Ambas"]];

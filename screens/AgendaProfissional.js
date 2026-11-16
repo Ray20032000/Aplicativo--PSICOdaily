@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Alert, FlatList, Linking, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { CalendarDays, Clock3, FileText, RefreshCw, Video } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 export default function AgendaProfissional() {
   const navigation = useNavigation(); const [sessions, setSessions] = useState([]); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [filter, setFilter] = useState("TODAS");
   const load = useCallback(async () => { setLoading(true); try { const token = await AsyncStorage.getItem("@psicodaily_token"); const response = await fetch(`${API}/api/consultas/`, { headers: { Authorization: `Bearer ${token}` } }); const data = await response.json(); if (!response.ok) throw new Error(data.error || "Não foi possível carregar a agenda."); setSessions((data.consultas || []).sort((a, b) => new Date(a.data_hora_inicio) - new Date(b.data_hora_inicio))); setError(""); } catch (e) { setError(e.message); } finally { setLoading(false); } }, []);

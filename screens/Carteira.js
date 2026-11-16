@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ArrowDownLeft, ArrowUpRight, RefreshCw, Wallet } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 const money = (cents) => (Number(cents || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export default function Carteira() {
   const [data, setData] = useState(null); const [days, setDays] = useState(30); const [loading, setLoading] = useState(true); const [error, setError] = useState("");

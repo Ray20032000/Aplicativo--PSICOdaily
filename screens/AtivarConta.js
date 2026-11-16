@@ -13,7 +13,7 @@ import {
 
 import { useState } from "react";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 
 export default function AtivarConta({ navigation }) {
     const [email, setEmail] = useState("");

@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { ArrowLeft, KeyRound, Pencil, UserRound, LogOut } from "lucide-react-native";
 
-const API_URL = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API_URL = "https://api.psicodaily.tech";
 
 function extrairUsuarios(dados) {
     if (Array.isArray(dados)) return dados;

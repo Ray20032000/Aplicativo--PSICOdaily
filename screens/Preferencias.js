@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { ArrowRight, UserRound, ClipboardList, Save } from "lucide-react-native";
 
-const API = "https://p01--psicodaily-api--zfhqcbxfx5v8.code.run";
+const API = "https://api.psicodaily.tech";
 export default function Preferencias() {
   const navigation = useNavigation(); const [role, setRole] = useState("PACIENTE"); const [token, setToken] = useState(""); const [usuario, setUsuario] = useState({}); const [descricao, setDescricao] = useState(""); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [error, setError] = useState("");
   const carregar = useCallback(async () => { setLoading(true); try { const [t, raw] = await Promise.all([AsyncStorage.getItem("@psicodaily_token"), AsyncStorage.getItem("@psicodaily_usuario")]); const u = raw ? JSON.parse(raw) : {}; const tipo = String(u.tipo_usuario || "PACIENTE").toUpperCase(); setToken(t || ""); setRole(tipo); setUsuario(u); if (["PSICOLOGO", "PSIQUIATRA"].includes(tipo) && u.id_usuario) { const r = await fetch(`${API}/api/profissionais/${u.id_usuario}`, { headers: { Authorization: `Bearer ${t}` } }); const d = await r.json(); if (r.ok) setDescricao(d.profissionais?.descricao || ""); } setError(""); } catch (e) { setError(e.message || "Não foi possível carregar as preferências."); } finally { setLoading(false); } }, []);
