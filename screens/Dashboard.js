@@ -11,6 +11,7 @@ import {
     Pressable,
     Image,
     ActivityIndicator,
+    Linking,
 } from "react-native";
 
 import {
@@ -481,7 +482,12 @@ export default function Dashboard() {
                 </Text>
 
 
-                <Pressable style={styles.cardMeditacao}>
+                <Pressable
+                    style={styles.cardMeditacao}
+                    onPress={() => Linking.openURL("https://youtu.be/y2oY8Aax6JA?si=HKU43nKD35TThpI8")}
+                    accessibilityRole="link"
+                    accessibilityLabel="Assistir meditação de 10 minutos no YouTube"
+                >
 
                     <Image
                         source={require("../assets/relaxar.png")}
